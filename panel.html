@@ -453,6 +453,7 @@ async function sbI(t,row){
   }
 }
 async function sbU(t,f,body){try{const r=await fetch(`${SB}/rest/v1/${t}?${f}`,{method:'PATCH',headers:SH,body:JSON.stringify(body)});return r.ok;}catch(e){return false;}}
+async function sbD(t,f){try{const r=await fetch(`${SB}/rest/v1/${t}?${f}`,{method:'DELETE',headers:SH});return r.ok;}catch(e){return false;}}
 
 function hash(s){let h=0;for(let i=0;i<s.length;i++)h=Math.imul(31,h)+s.charCodeAt(i)|0;return Math.abs(h).toString(16);}
 
@@ -1063,12 +1064,24 @@ async function renderDashboard(){
     rows.filter(m=>m.status==='aprobada'&&m.ciudad).forEach(m=>{ciudadCount[m.ciudad]=(ciudadCount[m.ciudad]||0)+1;});
     const topCiudades=Object.entries(ciudadCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
 
+    window._admStatsSnapshot={
+      modelos:{total:rows.length,aprobadas:aprob,pendientes:pend,esperando_fotos:fotos,rechazadas:rechaz,top_ciudades:topCiudades.map(([c,n])=>({ciudad:c,cantidad:n}))},
+      campanas:{total:camps.length,aprobadas:campAprob.length,pendientes:campPend,rechazadas:campRech},
+      finanzas:{facturado_total:facturado,pagado_por_clientes:pagado,pendiente_de_cobro:pendienteCobro,comision_ganada:comisionGanada,comision_por_cobrar:comisionProyectada,solicitado_por_modelos:solicitadoModelos},
+      facturacion_ultimos_6_meses:buckets.map(b=>({mes:b.label,miles_cop:b.value}))
+    };
+
     el.innerHTML=`
       <div class="metrics">
         <div class="metric-card"><div class="metric-label">Pendientes de revisión</div><div class="metric-val" data-count="${pend}">0</div><div class="metric-sub neutral">Nuevas aplicaciones</div></div>
         <div class="metric-card"><div class="metric-label">Esperando fotos</div><div class="metric-val" data-count="${fotos}">0</div><div class="metric-sub neutral">Book solicitado</div></div>
         <div class="metric-card"><div class="metric-label">Modelos aprobadas</div><div class="metric-val" data-count="${aprob}">0</div><div class="metric-sub up">✓ Catálogo activo</div></div>
         <div class="metric-card"><div class="metric-label">Campañas pendientes</div><div class="metric-val" data-count="${campPend}">0</div><div class="metric-sub neutral">Por aprobar</div></div>
+      </div>
+
+      <div class="panel" style="margin-bottom:1.5rem">
+        <div class="panel-head"><div class="panel-title">✨ Análisis profesional con IA</div><button id="ai-insights-btn" onclick="admGenerarInsights()" style="background:var(--gold);color:var(--bg);border:none;padding:.5rem 1.1rem;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Generar análisis</button></div>
+        <div id="ai-insights-box" style="font-size:.85rem;color:var(--gray);line-height:1.75">Genera un resumen ejecutivo de cómo va la agencia — finanzas, catálogo y campañas — redactado automáticamente a partir de tus datos reales.</div>
       </div>
 
       <div style="margin:.4rem 0 .8rem;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2)">Finanzas</div>
@@ -2155,16 +2168,33 @@ async function renderAdmOrden(){
 }
 
 /* ============ ADMIN — CAMPAÑAS ============ */
+let _admCampFiltro='todas';
 async function renderAdmCampanas(){
   const el=document.getElementById('main-content');
   el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
-  const camps=await sbQ('campanas','plataforma=eq.ag_elite_models&order=created_at.desc');
-  if(!camps.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Campañas</div><div class="empty" style="padding:4rem"><div class="empty-icon">🎯</div>No hay campañas aún.</div>`;return;}
-  const clienteIds=[...new Set(camps.map(c=>c.cliente_id).filter(Boolean))];
+  const campsAll=await sbQ('campanas','plataforma=eq.ag_elite_models&order=created_at.desc');
+  if(!campsAll.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Campañas</div><div class="empty" style="padding:4rem"><div class="empty-icon">🎯</div>No hay campañas aún.</div>`;return;}
+  const clienteIds=[...new Set(campsAll.map(c=>c.cliente_id).filter(Boolean))];
   const clientes=clienteIds.length?await sbQ('clientes','id=in.('+clienteIds.map(i=>`"${i}"`).join(',')+')'):[];
   const cm=Object.fromEntries(clientes.map(cl=>[cl.id,cl]));
-  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Campañas (${camps.length})</div>` +
-    camps.map(c=>{
+
+  const counts={
+    todas:campsAll.length,
+    pendiente:campsAll.filter(c=>c.status==='pendiente').length,
+    aprobada:campsAll.filter(c=>c.status==='aprobada').length,
+    rechazada:campsAll.filter(c=>c.status==='rechazada').length
+  };
+  const camps=_admCampFiltro==='todas'?campsAll:campsAll.filter(c=>c.status===_admCampFiltro);
+
+  const tabs=[['todas','Todas'],['pendiente','Pendientes'],['aprobada','Aprobadas'],['rechazada','Rechazadas']];
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.2rem">
+      <div style="font-size:.9rem;font-weight:500">Campañas (${campsAll.length})</div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+        ${tabs.map(([key,label])=>`<button onclick="_admCampFiltro='${key}';renderAdmCampanas()" style="background:${_admCampFiltro===key?'var(--gold)':'none'};color:${_admCampFiltro===key?'var(--bg)':'var(--gray)'};border:1px solid ${_admCampFiltro===key?'var(--gold)':'var(--border)'};padding:.4rem .9rem;font-size:.68rem;letter-spacing:.05em;cursor:pointer;font-family:var(--ff);font-weight:${_admCampFiltro===key?'700':'400'}">${label} (${counts[key]})</button>`).join('')}
+      </div>
+    </div>` +
+    (camps.length?camps.map(c=>{
       const cl=cm[c.cliente_id]||{};
       return `
     <div class="panel" style="margin-bottom:.9rem;cursor:pointer" onclick="admVerCampana('${c.id}')">
@@ -2180,20 +2210,97 @@ async function renderAdmCampanas(){
             <button class="pbtn-red" style="background:none;border:1px solid var(--red);color:var(--red);padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admRechazarCampana('${c.id}')">✗</button>`:
             `<span class="badge ${c.status}">${c.status==='aprobada'?'✓ Aprobada':'✗ Rechazada'}</span>`}
           <button style="background:none;border:1px solid var(--border);color:var(--gray);padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admVerCampana('${c.id}')">Ver Detalle →</button>
+          <button title="Eliminar" style="background:none;border:1px solid var(--red);color:var(--red);padding:.4rem .6rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admConfirmarEliminar('${c.id}','${(c.titulo||'').replace(/'/g,"\\'")}')">🗑</button>
         </div>
       </div>
       ${c.perfil_buscado?`<div style="font-size:.78rem;color:var(--gray)"><b style="color:rgba(255,255,255,.6)">Perfil:</b> ${c.perfil_buscado}</div>`:''}
       ${c.valor_total?`<div style="font-size:.78rem;color:var(--gold);margin-top:.2rem">💰 ${fmtCOP(c.valor_total)}${c.comision_porcentaje?' · Comisión '+c.comision_porcentaje+'% · Neto modelo '+fmtCOP(montoNeto(c)):' · Sin comisión asignada aún'}</div>`:''}
       ${c.descripcion?`<p style="font-size:.78rem;color:var(--gray);margin-top:.4rem;line-height:1.6">${c.descripcion}</p>`:''}
-    </div>`;}).join('');
+    </div>`;}).join(''):`<div class="empty" style="padding:3rem"><div class="empty-icon">✦</div>No hay campañas en esta categoría.</div>`);
 }
 async function admAprobarCampana(id){await sbU('campanas','id=eq.'+encodeURIComponent(id),{status:'aprobada'});renderAdmCampanas();}
 async function admRechazarCampana(id){await sbU('campanas','id=eq.'+encodeURIComponent(id),{status:'rechazada'});renderAdmCampanas();}
 
 /* ============ ADMIN — DETALLE DE CAMPAÑA + COMISIÓN ============ */
+let _admCampCache={};
+function admCampInfoView(c){
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:.3rem">
+      <div style="font-size:1.3rem;font-weight:600">${c.titulo}</div>
+      <span class="badge ${c.status}">${c.status==='pendiente'?'⏳ Pendiente':c.status==='aprobada'?'✓ Aprobada':'✗ Rechazada'}</span>
+    </div>
+    <div style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.horario?' · '+c.horario:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
+    ${c.perfil_buscado?`<div style="font-size:.8rem;margin-bottom:.6rem"><b style="color:rgba(255,255,255,.6)">Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
+    ${c.descripcion?`<p style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-bottom:1rem">${c.descripcion}</p>`:''}
+    <div style="display:flex;gap:1.5rem;margin-bottom:.4rem;font-size:.78rem;color:var(--gray2)">
+      ${c.transporte?'✈ Transporte':''}${c.alimentacion?' 🍽 Alimentación':''}${c.vestuario?' 👗 Vestuario':''}
+    </div>`;
+}
+function admCampInfoEdit(c){
+  return `
+    <div class="fgroup"><label class="flabel">Título</label><input type="text" class="finput-white" id="ec-titulo-${c.id}" value="${(c.titulo||'').replace(/"/g,'&quot;')}"></div>
+    <div class="fgrid3" style="margin-bottom:.6rem">
+      <div class="fgroup"><label class="flabel">Tipo</label><input type="text" class="finput-white" id="ec-tipo-${c.id}" value="${(c.tipo||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fgroup"><label class="flabel">Ciudad</label><input type="text" class="finput-white" id="ec-ciudad-${c.id}" value="${(c.ciudad||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fgroup"><label class="flabel">Fecha</label><input type="text" class="finput-white" id="ec-fecha-${c.id}" value="${(c.fecha||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="fgrid3" style="margin-bottom:.6rem">
+      <div class="fgroup"><label class="flabel">Horario</label><input type="text" class="finput-white" id="ec-horario-${c.id}" value="${(c.horario||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fgroup"><label class="flabel">N° Modelos</label><input type="number" class="finput-white" id="ec-nmodelos-${c.id}" value="${c.num_modelos||1}"></div>
+      <div class="fgroup"><label class="flabel">Perfil buscado</label><input type="text" class="finput-white" id="ec-perfil-${c.id}" value="${(c.perfil_buscado||'').replace(/"/g,'&quot;')}"></div>
+    </div>
+    <div class="fgroup" style="margin-bottom:.6rem"><label class="flabel">Descripción</label><textarea class="finput-white" id="ec-desc-${c.id}" style="min-height:80px;resize:vertical">${c.descripcion||''}</textarea></div>
+    <div style="display:flex;gap:1.2rem;margin-bottom:1rem;font-size:.78rem">
+      <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="ec-transporte-${c.id}" ${c.transporte?'checked':''}> Transporte</label>
+      <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="ec-alimentacion-${c.id}" ${c.alimentacion?'checked':''}> Alimentación</label>
+      <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="ec-vestuario-${c.id}" ${c.vestuario?'checked':''}> Vestuario</label>
+    </div>
+    <div style="display:flex;gap:.6rem;margin-bottom:1rem">
+      <button onclick="admGuardarInfoCampana('${c.id}')" style="background:var(--gold);color:var(--bg);border:none;padding:.5rem 1.1rem;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Guardar cambios</button>
+      <button onclick="admRenderCampInfo('${c.id}',false)" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.5rem 1.1rem;font-size:.7rem;cursor:pointer;font-family:var(--ff)">Cancelar</button>
+    </div>`;
+}
+function admRenderCampInfo(id,editing){
+  const c=_admCampCache[id]; if(!c) return;
+  const box=document.getElementById('adm-camp-info-'+id);
+  if(box) box.innerHTML=editing?admCampInfoEdit(c):admCampInfoView(c);
+  const editBtn=document.getElementById('adm-editbtn-'+id);
+  if(editBtn) editBtn.style.display=editing?'none':'inline-block';
+}
+async function admGuardarInfoCampana(id){
+  const v=fid=>document.getElementById(fid+'-'+id)?.value;
+  const data={
+    titulo:v('ec-titulo'), tipo:v('ec-tipo'), ciudad:v('ec-ciudad'), fecha:v('ec-fecha'),
+    horario:v('ec-horario'), num_modelos:parseInt(v('ec-nmodelos'))||1, perfil_buscado:v('ec-perfil'),
+    descripcion:v('ec-desc'),
+    transporte:document.getElementById('ec-transporte-'+id).checked,
+    alimentacion:document.getElementById('ec-alimentacion-'+id).checked,
+    vestuario:document.getElementById('ec-vestuario-'+id).checked
+  };
+  const ok=await sbU('campanas','id=eq.'+encodeURIComponent(id),data);
+  if(ok){
+    _admCampCache[id]={..._admCampCache[id],...data};
+    admRenderCampInfo(id,false);
+  } else {
+    alert('Error al guardar los cambios.');
+  }
+}
+async function admConfirmarEliminar(id,titulo){
+  if(!confirm(`¿Seguro que quieres eliminar la campaña "${titulo}"?\n\nEsto también borrará sus postulaciones asociadas. Esta acción no se puede deshacer.`)) return;
+  await sbD('postulaciones','campana_id=eq.'+encodeURIComponent(id));
+  const ok=await sbD('campanas','id=eq.'+encodeURIComponent(id));
+  if(ok){
+    document.querySelectorAll('[style*="z-index:5500"]').forEach(o=>o.remove());
+    renderAdmCampanas();
+  } else {
+    alert('Error al eliminar la campaña.');
+  }
+}
+
 async function admVerCampana(id){
   const camps=await sbQ('campanas','id=eq.'+encodeURIComponent(id));
   const c=camps[0]; if(!c) return;
+  _admCampCache[id]=c;
   const clientesR=c.cliente_id?await sbQ('clientes','id=eq.'+encodeURIComponent(c.cliente_id)):[];
   const cl=clientesR[0]||{};
   const posts=await sbQ('postulaciones','campana_id=eq.'+encodeURIComponent(id));
@@ -2207,11 +2314,11 @@ async function admVerCampana(id){
   overlay.innerHTML=`
     <div style="max-width:760px;margin:0 auto;background:#111;border:1px solid var(--border);padding:2rem;color:#fff;position:relative">
       <button onclick="this.closest('[style*=z-index]').remove()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer">✕</button>
-      <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:.3rem">
-        <div style="font-size:1.3rem;font-weight:600">${c.titulo}</div>
-        <span class="badge ${c.status}">${c.status==='pendiente'?'⏳ Pendiente':c.status==='aprobada'?'✓ Aprobada':'✗ Rechazada'}</span>
+      <div id="adm-camp-info-${c.id}">${admCampInfoView(c)}</div>
+      <div style="display:flex;gap:.6rem;margin-bottom:1.2rem">
+        <button id="adm-editbtn-${c.id}" onclick="admRenderCampInfo('${c.id}',true)" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.5rem 1.1rem;font-size:.7rem;cursor:pointer;font-family:var(--ff)">✏️ Editar información</button>
+        <button onclick="admConfirmarEliminar('${c.id}','${(c.titulo||'').replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--red);color:var(--red);padding:.5rem 1.1rem;font-size:.7rem;cursor:pointer;font-family:var(--ff)">🗑 Eliminar campaña</button>
       </div>
-      <div style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.horario?' · '+c.horario:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
       <div style="font-size:.75rem;color:var(--gold);margin-bottom:1.2rem">Cliente: ${cl.nombre||cl.empresa||'—'}${cl.whatsapp?' · '+cl.whatsapp:''}${cl.email?' · '+cl.email:''}</div>
 
       <div style="margin-bottom:1.2rem">
@@ -2224,11 +2331,6 @@ async function admVerCampana(id){
             <span class="fstatus" id="adm-portada-st-${c.id}" style="display:inline-block;margin-left:.6rem"></span>
           </div>
         </div>
-      </div>
-      ${c.perfil_buscado?`<div style="font-size:.8rem;margin-bottom:.6rem"><b style="color:rgba(255,255,255,.6)">Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
-      ${c.descripcion?`<p style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-bottom:1rem">${c.descripcion}</p>`:''}
-      <div style="display:flex;gap:1.5rem;margin-bottom:1.2rem;font-size:.78rem;color:var(--gray2)">
-        ${c.transporte?'✈ Transporte':''}${c.alimentacion?' 🍽 Alimentación':''}${c.vestuario?' 👗 Vestuario':''}
       </div>
 
       <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);padding:1.2rem;margin-bottom:1.2rem">
@@ -2297,6 +2399,30 @@ function admPintarSugerencias(sugerencias,tituloCampana){
       ${s.whatsapp?`<a href="https://wa.me/${(s.whatsapp||'').replace(/\D/g,'')}?text=${msg}" target="_blank" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.4rem .8rem;font-size:.66rem;text-decoration:none;font-family:var(--ff)">📩 WhatsApp</a>`:''}
     </div>`).join('');
 }
+/* ============ AGENTE DE ESTADÍSTICAS PROFESIONALES (IA) ============ */
+async function admGenerarInsights(){
+  const box=document.getElementById('ai-insights-box');
+  const btn=document.getElementById('ai-insights-btn');
+  if(!box||!window._admStatsSnapshot) return;
+  btn.disabled=true;btn.textContent='Analizando...';
+  box.innerHTML='<div class="loader-wrap" style="padding:1rem 0"><div class="loader-spin"></div>La IA está revisando los números de la agencia...</div>';
+  try{
+    const res=await fetch('/.netlify/functions/business-insights',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({stats:window._admStatsSnapshot})
+    });
+    const data=await res.json();
+    if(!res.ok||!data.analisis){
+      box.innerHTML=`<span style="color:var(--red)">${data.error||'Error generando el análisis.'}</span>`;
+    } else {
+      box.innerHTML=data.analisis.split('\n').filter(l=>l.trim()).map(l=>`<p style="margin-bottom:.7rem">${l}</p>`).join('');
+    }
+  }catch(e){
+    box.innerHTML='<span style="color:var(--red)">Error de conexión con la IA.</span>';
+  }
+  btn.disabled=false;btn.textContent='↻ Regenerar análisis';
+}
+
 async function admSugerirModelos(campId){
   const box=document.getElementById('ia-sug-'+campId);
   box.innerHTML='<div class="loader-wrap" style="padding:1rem 0"><div class="loader-spin"></div>La IA está revisando el catálogo...</div>';
