@@ -134,10 +134,18 @@ textarea.finput-white{min-height:90px;resize:vertical}
 /* RESPONSIVE */
 @media(max-width:768px){
   .app{grid-template-columns:1fr}
-  .sidebar{display:none}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:78vw;max-width:300px;z-index:2000;transform:translateX(-100%);transition:transform .28s ease;display:flex!important}
+  .sidebar.mob-open{transform:translateX(0)}
+  .sb-toggle{display:flex!important}
+  #mob-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1999}
+  #mob-backdrop.show{display:block}
   .metrics{grid-template-columns:1fr 1fr}
   .grid2{grid-template-columns:1fr}
+  .login-box{padding:2rem 1.4rem;max-width:100%}
+  .topbar-right .topbar-btn{font-size:.62rem;padding:.4rem .7rem}
+  .topbar-right a{display:none}
 }
+.sb-toggle{display:none;background:none;border:none;color:var(--white);font-size:1.3rem;cursor:pointer;padding:0 .8rem 0 0}
 .ptog{background:transparent;border:1px solid var(--border);color:var(--gray);padding:.5rem 1rem;font-size:.75rem;letter-spacing:.04em;cursor:pointer;font-family:var(--ff);transition:all .15s}
 .ptog:hover{border-color:rgba(255,255,255,.3)}
 .ptog.sel{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600}
@@ -408,7 +416,7 @@ button,.fbtn,.fbtn-outline,.ptog,.sb-link,.mc-cta{transition:transform .12s ease
   <!-- MAIN -->
   <div class="main">
     <div class="topbar">
-      <div class="topbar-title"><span id="tb-section">Dashboard</span></div>
+      <div class="topbar-title"><button class="sb-toggle" onclick="toggleMobSidebar()">☰</button><span id="tb-section">Dashboard</span></div>
       <div class="topbar-right">
         <button class="topbar-btn" onclick="refreshData()">↻ Actualizar datos</button>
         <a href="/" style="font-size:.72rem;color:var(--gray);letter-spacing:.08em;text-transform:uppercase">← Volver al sitio</a>
@@ -417,6 +425,7 @@ button,.fbtn,.fbtn-outline,.ptog,.sb-link,.mc-cta{transition:transform .12s ease
     <div class="content" id="main-content"></div>
   </div>
 </div>
+<div id="mob-backdrop" onclick="toggleMobSidebar()"></div>
 
 <script>
 const SB='https://vzgzalcvkzttsrjlisfs.supabase.co';
@@ -978,9 +987,15 @@ function renderSidebar(){
     ${links.map(l=>`<button class="sb-link${_tab===l.id?' active':''}" onclick="navTo('${l.id}')"><span class="icon">${l.icon}</span>${l.label}</button>`).join('')}`;
 }
 
+function toggleMobSidebar(){
+  document.querySelector('.sidebar')?.classList.toggle('mob-open');
+  document.getElementById('mob-backdrop')?.classList.toggle('show');
+}
 function navTo(tab){
   _tab=tab;
   renderSidebar();
+  document.querySelector('.sidebar')?.classList.remove('mob-open');
+  document.getElementById('mob-backdrop')?.classList.remove('show');
   document.getElementById('tb-section').textContent=document.querySelector(`.sb-link[onclick*="${tab}"]`)?.textContent?.trim()||tab;
   const mc=document.getElementById('main-content');
   mc.style.animation='none';void mc.offsetWidth;mc.style.animation='';
