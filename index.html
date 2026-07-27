@@ -65,18 +65,28 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 #mob .mc{position:absolute;top:1.8rem;right:1.8rem;background:none;border:1px solid rgba(0,0,0,.18);color:var(--black);width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem}
 
 /* HERO */
-#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--bg);overflow:hidden}
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--bg);overflow:hidden;position:relative}
+#hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(200,165,90,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(200,165,90,.07) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 75%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 75%);pointer-events:none;z-index:0;animation:gridDrift 18s linear infinite}
+@keyframes gridDrift{from{background-position:0 0}to{background-position:44px 44px}}
+
+/* SCROLL PROGRESS BAR */
+#scroll-progress{position:fixed;top:0;left:0;height:2px;width:0%;background:linear-gradient(90deg,var(--gold),var(--black));z-index:10000;pointer-events:none}
+
+/* 3D TILT (mouse move) */
+.tilt-3d{transform-style:preserve-3d;will-change:transform}
+.tilt-3d-parent{perspective:1000px}
 .hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:8vw 4vw 8vw 5vw;position:relative;z-index:2}
 .hero-right{position:relative;overflow:hidden;background:var(--bg3)}
 .hero-right img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block}
 .hero-tag{display:inline-flex;align-items:center;gap:.7rem;font-size:8px;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);margin-bottom:2rem;animation:fU .8s ease .1s both}
 .hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--wa);animation:pulse 2s ease infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
-.hero-h1{font-family:var(--ff-h);font-size:clamp(5rem,12vw,11rem);line-height:.85;letter-spacing:.02em;color:var(--black);margin-bottom:1.8rem;animation:fU .85s ease .2s both}
+.hero-h1{font-family:var(--ff-h);font-size:clamp(5rem,12vw,11rem);line-height:.85;letter-spacing:.02em;color:var(--black);margin-bottom:1.8rem;perspective:700px}
+.hero-h1 .hl{display:inline-block;opacity:0}
 .hero-h1 .stroke{color:var(--black)}
-.hero-sub{font-family:var(--ff-s);font-size:clamp(1rem,1.4vw,1.18rem);color:var(--gray);max-width:420px;margin-bottom:2.5rem;line-height:1.75;animation:fU .8s ease .35s both}
-.hero-btns{display:flex;gap:.8rem;flex-wrap:wrap;animation:fU .8s ease .45s both}
-.hero-stats{position:absolute;bottom:3rem;left:5vw;display:flex;gap:3rem;animation:fI 1s ease 1s both}
+.hero-sub{font-family:var(--ff-s);font-size:clamp(1rem,1.4vw,1.18rem);color:var(--gray);max-width:420px;margin-bottom:2.5rem;line-height:1.75;opacity:0}
+.hero-btns{display:flex;gap:.8rem;flex-wrap:wrap;opacity:0}
+.hero-stats{position:absolute;bottom:3rem;left:5vw;display:flex;gap:3rem;opacity:0}
 .hs .n{font-family:var(--ff-h);font-size:2.5rem;color:var(--black);line-height:1}
 .hs .l{font-size:7.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--gray-soft)}
 .hero-scroll{position:absolute;bottom:3rem;right:5vw;display:flex;flex-direction:column;align-items:center;gap:.5rem;font-size:7.5px;letter-spacing:.35em;text-transform:uppercase;color:var(--gray-soft);animation:fI 1s ease 1.2s both}
@@ -174,6 +184,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
@@ -536,8 +548,8 @@ footer{background:var(--black);padding:5rem 5vw 2.5rem}
 <section id="hero">
   <div class="hero-left">
     <div class="hero-tag"><span class="dot"></span>Medellín, Colombia · Psycho Production</div>
-    <h1 class="hero-h1">AG<br>ELITE<br><span class="stroke">MODELS</span></h1>
-    <p class="hero-sub">Talento profesional para videos musicales, campañas, TikTok y producciones de alto nivel en Colombia.</p>
+    <h1 class="hero-h1"><span class="hl">AG</span><br><span class="hl">ELITE</span><br><span class="hl stroke">MODELS</span></h1>
+    <p class="hero-sub">Representamos modelos para campañas publicitarias, producciones audiovisuales, eventos de moda y colaboraciones con marcas de alto nivel.</p>
     <div class="hero-btns">
       <a href="#gallery" class="btn btn-black">Ver Modelos</a>
       <a href="https://wa.me/573127444324" target="_blank" class="btn btn-wa">WhatsApp</a>
@@ -2757,6 +2769,78 @@ function admDescargarCC(cc,m){
 
 /* ============ INIT ============ */
 window.addEventListener('DOMContentLoaded', ()=>{ checkMagicLink(); });
+</script>
+
+<!-- ============ ANIMACIÓN CINEMATOGRÁFICA (GSAP) ============ -->
+<script>
+(function(){
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const gsapOK = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
+
+  function showInstantly(){
+    document.querySelectorAll('.hero-h1 .hl, .hero-sub, .hero-btns, .hero-stats').forEach(el=>{
+      el.style.opacity=1; el.style.transform='none';
+    });
+  }
+
+  // Si GSAP no carga (CDN bloqueado) o el usuario prefiere menos movimiento,
+  // mostramos el contenido de una vez, sin animación, para que nunca quede invisible.
+  if(!gsapOK || reduced){ showInstantly(); return; }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* Barra de progreso de scroll */
+  const bar=document.createElement('div');
+  bar.id='scroll-progress';
+  document.body.appendChild(bar);
+  gsap.to(bar,{
+    width:'100%',
+    ease:'none',
+    scrollTrigger:{
+      scrub:true,
+      start:0,
+      end:()=>document.documentElement.scrollHeight-window.innerHeight
+    }
+  });
+
+  /* Intro cinematográfica del héroe */
+  gsap.set('.hero-h1 .hl',{opacity:0,y:80,rotateX:-70,transformOrigin:'50% 100%'});
+  const tl=gsap.timeline({defaults:{ease:'power4.out'}});
+  tl.to('.hero-h1 .hl',{opacity:1,y:0,rotateX:0,duration:1,stagger:.12})
+    .to('.hero-sub',{opacity:1,duration:.7},'-=.35')
+    .to('.hero-btns',{opacity:1,duration:.6},'-=.4')
+    .to('.hero-stats',{opacity:1,duration:.8},'-=.2');
+
+  /* Inclinación 3D con el mouse (tarjetas de modelos, campañas y servicios) */
+  function attachTilt(selector){
+    document.querySelectorAll(selector).forEach(card=>{
+      card.classList.add('tilt-3d');
+      if(card.parentElement) card.parentElement.classList.add('tilt-3d-parent');
+      card.addEventListener('mousemove',e=>{
+        const r=card.getBoundingClientRect();
+        const x=(e.clientX-r.left)/r.width-0.5;
+        const y=(e.clientY-r.top)/r.height-0.5;
+        gsap.to(card,{rotateY:x*10,rotateX:-y*10,duration:.4,ease:'power2.out'});
+      });
+      card.addEventListener('mouseleave',()=>{
+        gsap.to(card,{rotateY:0,rotateX:0,duration:.5,ease:'power3.out'});
+      });
+    });
+  }
+  attachTilt('.mc');
+  attachTilt('.camp-card');
+  attachTilt('.svc');
+
+  /* Re-aplicar el tilt cuando se pinten tarjetas nuevas dinámicamente (modelos/campañas cargan por fetch) */
+  const tiltObserver=new MutationObserver(()=>{
+    attachTilt('.mc');
+    attachTilt('.camp-card');
+  });
+  ['dynamic-models-grid','camp-grid'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) tiltObserver.observe(el,{childList:true});
+  });
+})();
 </script>
 </body>
 
