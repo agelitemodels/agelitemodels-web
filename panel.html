@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Panel — AG Elite Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#222;--border:rgba(255,255,255,.07);
+  --gold:#C8A55A;--gold-d:#a07820;--white:#fff;--gray:rgba(255,255,255,.4);
+  --gray2:rgba(255,255,255,.2);--green:#2f6b4f;--red:#e74c3c;
+  --ff:'Inter',sans-serif;--ffh:'Bebas Neue',sans-serif;
+}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--white);font-size:14px;font-weight:300}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--ff);cursor:pointer}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:220px 1fr;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:1.5rem 1.2rem;border-bottom:1px solid var(--border)}
+.sb-logo-name{font-family:var(--ffh);font-size:1.1rem;letter-spacing:.12em;color:var(--gold)}
+.sb-logo-sub{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-top:.2rem}
+.sb-user{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--gold-d);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.85rem;color:var(--bg);flex-shrink:0}
+.sb-user-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-role{font-size:.65rem;color:var(--gray);letter-spacing:.06em;text-transform:uppercase}
+.sb-section{padding:.8rem 1.2rem .3rem;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray2)}
+.sb-link{display:flex;align-items:center;gap:.7rem;padding:.6rem 1.2rem;font-size:.82rem;color:var(--gray);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all .15s;border-radius:0}
+.sb-link:hover{color:var(--white);background:rgba(255,255,255,.04)}
+.sb-link.active{color:var(--white);background:rgba(200,165,90,.1);border-left:2px solid var(--gold)}
+.sb-link .icon{width:16px;text-align:center;flex-shrink:0}
+.sb-bottom{margin-top:auto;padding:1rem 1.2rem;border-top:1px solid var(--border)}
+.sb-logout{display:flex;align-items:center;gap:.7rem;font-size:.78rem;color:var(--gray);cursor:pointer;background:none;border:none;width:100%;padding:.5rem 0}
+.sb-logout:hover{color:var(--white)}
+
+/* MAIN */
+.main{overflow-y:auto;display:flex;flex-direction:column}
+.topbar{padding:1.2rem 2rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:var(--bg);position:sticky;top:0;z-index:10}
+.topbar-title{font-size:.82rem;color:var(--gray)}
+.topbar-title b{color:var(--white)}
+.topbar-right{display:flex;align-items:center;gap:.8rem}
+.topbar-btn{background:rgba(200,165,90,.15);color:var(--gold);border:1px solid rgba(200,165,90,.3);padding:.45rem 1rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);transition:all .2s}
+.topbar-btn:hover{background:rgba(200,165,90,.25)}
+.content{padding:2rem;flex:1}
+
+/* CARDS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.metric-card{background:var(--bg2);border:1px solid var(--border);padding:1.3rem 1.5rem}
+.metric-label{font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gray);margin-bottom:.6rem}
+.metric-val{font-size:1.8rem;font-weight:600;line-height:1;margin-bottom:.4rem}
+.metric-sub{font-size:.72rem;color:var(--gray)}
+.metric-sub.up{color:#2ecc71}
+.metric-sub.neutral{color:var(--gray)}
+
+/* GRID 2COL */
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:2rem}
+
+/* PANELS */
+.panel{background:var(--bg2);border:1px solid var(--border);padding:1.5rem}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+.panel-title{font-size:.85rem;font-weight:500}
+.panel-sub{font-size:.72rem;color:var(--gray)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray);padding:.6rem .8rem;text-align:left;border-bottom:1px solid var(--border)}
+.tbl td{padding:.8rem;font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+
+/* BADGE */
+.badge{display:inline-block;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .65rem;border-radius:20px}
+.badge.pendiente{background:rgba(160,120,32,.2);color:#d4aa50}
+.badge.aprobada{background:rgba(47,107,79,.2);color:#4caf7d}
+.badge.rechazada{background:rgba(231,76,60,.2);color:#e74c3c}
+
+/* ACTIVITY */
+.activity-item{display:flex;align-items:flex-start;gap:.8rem;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:7px;height:7px;border-radius:50%;background:var(--border);flex-shrink:0;margin-top:.3rem}
+.activity-dot.new{background:var(--gold)}
+.activity-text{font-size:.8rem;color:rgba(255,255,255,.7);line-height:1.5}
+.activity-time{font-size:.68rem;color:var(--gray);margin-top:.15rem}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 1rem;color:var(--gray)}
+.empty-icon{font-size:1.8rem;margin-bottom:.8rem;opacity:.4}
+
+/* FORM */
+.fgroup{margin-bottom:1rem}
+.flabel{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:.35rem}
+.finput{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-bottom:1px solid rgba(200,165,90,.4);color:var(--white);font-family:var(--ff);font-size:.85rem;font-weight:300;padding:.72rem 1rem;outline:none;transition:all .2s}
+.finput:focus{border-color:var(--gold);background:rgba(200,165,90,.04)}
+.finput::placeholder{color:var(--gray2)}
+.finput-white{background:#fff;border:none;border-bottom:2px solid var(--gold);color:#0a0a0a;width:100%;font-family:var(--ff);font-size:.85rem;font-weight:300;padding:.72rem 1rem;outline:none}
+.finput-white::placeholder{color:rgba(0,0,0,.35)}
+select.finput-white{-webkit-appearance:none}
+textarea.finput-white{min-height:90px;resize:vertical}
+.fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+.fbtn{background:var(--gold);color:var(--bg);border:none;padding:.85rem 2rem;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer;font-family:var(--ff);transition:background .2s}
+.fbtn:hover{background:var(--gold-d)}
+.fbtn-outline{background:transparent;color:var(--white);border:1px solid var(--border);padding:.6rem 1.2rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);transition:all .2s}
+.fbtn-outline:hover{border-color:rgba(255,255,255,.4)}
+.fstatus{font-size:.78rem;margin-top:.6rem;min-height:1rem}
+.fstatus.ok{color:#2ecc71}
+.fstatus.err{color:var(--red)}
+.fstatus.info{color:var(--gray)}
+
+/* CHART */
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:120px;padding-top:1rem}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;background:rgba(200,165,90,.25);border-radius:2px 2px 0 0;transition:height .4s ease;min-height:2px}
+.bar.active{background:var(--gold)}
+.bar-label{font-size:.58rem;color:var(--gray);letter-spacing:.04em}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.login-box{background:var(--bg2);border:1px solid var(--border);padding:3rem;width:100%;max-width:420px}
+.login-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.ltab{padding:.7rem 1.2rem;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;color:var(--gray);cursor:pointer;font-family:var(--ff);transition:all .2s;margin-bottom:-1px}
+.ltab.active{color:var(--white);border-bottom-color:var(--gold)}
+
+/* PROFILE FOTO */
+.model-foto{width:60px;height:60px;overflow:hidden;background:var(--bg3);flex-shrink:0}
+.model-foto img{width:100%;height:100%;object-fit:cover;object-position:top}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .metrics{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+}
+.ptog{background:transparent;border:1px solid var(--border);color:var(--gray);padding:.5rem 1rem;font-size:.75rem;letter-spacing:.04em;cursor:pointer;font-family:var(--ff);transition:all .15s}
+.ptog:hover{border-color:rgba(255,255,255,.3)}
+.ptog.sel{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600}
+.preg-photo-box:hover{border-color:var(--gold)}
+.tat-tag-p{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:.25rem .7rem;font-size:.72rem;color:var(--gray)}
+.tat-tag-p button{background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;line-height:1}
+#login-screen.wide .login-box{max-width:900px}
+
+/* ============ INTERACTIVIDAD / ANIMACIÓN GLOBAL ============ */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeScaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+@keyframes overlayFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulseSoft{0%,100%{opacity:1}50%{opacity:.55}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+@keyframes countBar{from{width:0}}
+
+#main-content{animation:fadeInUp .32s cubic-bezier(.16,1,.3,1) both}
+
+.panel,.metric-card{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.panel:hover{border-color:rgba(255,255,255,.14)}
+.metric-card{position:relative;overflow:hidden}
+.metric-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.35);border-color:rgba(200,165,90,.3)}
+.metric-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,165,90,.06),transparent 60%);opacity:0;transition:opacity .25s}
+.metric-card:hover::after{opacity:1}
+.metric-val{transition:color .2s}
+
+.sb-link{position:relative;transition:color .18s,background .18s,padding-left .18s}
+.sb-link:hover{padding-left:1.4rem}
+.sb-link .icon{transition:transform .18s}
+.sb-link:hover .icon{transform:scale(1.15)}
+.sb-link.active{position:relative}
+.sb-link.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold);animation:fadeInUp .25s ease}
+
+button,.fbtn,.fbtn-outline,.ptog,.sb-link,.mc-cta{transition:transform .12s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
+.fbtn:hover,.fbtn-outline:hover{transform:translateY(-1px)}
+.fbtn:active,.fbtn-outline:active,.ptog:active,button:active{transform:scale(.96)}
+.fbtn:hover{box-shadow:0 6px 16px rgba(200,165,90,.25)}
+
+.badge.pendiente{animation:pulseSoft 2.2s ease-in-out infinite}
+.badge{transition:transform .15s}
+.tbl tr{transition:background .15s}
+
+.empty-icon{display:inline-block;animation:floatY 3s ease-in-out infinite}
+
+.fstatus:not(:empty){animation:slideInLeft .25s ease both}
+
+.finput,.finput-white{transition:box-shadow .2s,border-color .2s,transform .15s}
+.finput:focus,.finput-white:focus{transform:translateY(-1px)}
+
+/* Overlays / modales */
+[style*="z-index:5500"]{animation:overlayFadeIn .2s ease both}
+[style*="z-index:5500"] > div{animation:fadeScaleIn .28s cubic-bezier(.16,1,.3,1) both}
+
+/* Spinner de carga */
+.loader-wrap{display:flex;align-items:center;gap:.7rem;padding:2.5rem;color:var(--gray);font-size:.8rem}
+.loader-spin{width:18px;height:18px;border:2px solid rgba(200,165,90,.25);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+/* Barra de progreso de pago con animación de llenado */
+.pay-progress-fill{animation:countBar .8s cubic-bezier(.16,1,.3,1) both}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box" style="text-align:center">
+    <div style="width:64px;height:64px;border-radius:16px;background:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-family:var(--ffh);font-size:1.6rem;color:var(--bg)">AG</div>
+    <div style="font-family:var(--ffh);font-size:1.7rem;letter-spacing:.02em;margin-bottom:.3rem">AG Elite Models</div>
+    <div style="font-size:.85rem;color:var(--gray);margin-bottom:1.8rem">Ingresa a tu cuenta</div>
+
+    <div style="display:flex;background:rgba(255,255,255,.05);border-radius:12px;padding:4px;margin-bottom:1.8rem">
+      <button class="pilltab active" id="pt-ingresar" onclick="setPillTab('ingresar')" style="flex:1;padding:.7rem 1rem;border-radius:9px;font-size:.85rem;font-weight:600;border:none;cursor:pointer;font-family:var(--ff);transition:all .2s;background:var(--white);color:var(--bg)">Ingresar</button>
+      <button class="pilltab" id="pt-registrarse" onclick="setPillTab('registrarse')" style="flex:1;padding:.7rem 1rem;border-radius:9px;font-size:.85rem;font-weight:600;border:none;cursor:pointer;font-family:var(--ff);transition:all .2s;background:transparent;color:var(--gray)">Registrarse</button>
+    </div>
+
+    <div id="pill-content" style="text-align:left"></div>
+
+    <div style="text-align:center;margin-top:1.5rem">
+      <a href="/" style="font-size:.8rem;color:var(--gray);text-decoration:none">← Volver a la página</a>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRO MODELO (4 PASOS) -->
+<div id="reg-modelo-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg);overflow-y:auto">
+  <div style="max-width:820px;margin:0 auto;padding:3rem 1.5rem 5rem">
+    <button onclick="showLoginScreen()" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.5rem 1rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);margin-bottom:2rem">← Volver al login</button>
+    <div style="text-align:center;margin-bottom:2.5rem">
+      <div style="font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">✦ Únete a la Agencia</div>
+      <div style="font-family:var(--ffh);font-size:2.6rem;line-height:1;margin-bottom:1rem">Regístrate como<br>Modelo</div>
+      <p style="color:var(--gray);font-size:.9rem;max-width:520px;margin:0 auto">Completa el formulario en 4 pasos. Nuestro equipo revisará tu perfil y te contactará por WhatsApp en menos de 24 horas.</p>
+    </div>
+    <div class="reg-steps" style="display:flex;align-items:center;margin-bottom:2.5rem">
+      <div class="rs active" id="prs1" style="text-align:center"><div style="width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.85rem;margin:0 auto .3rem">1</div><div style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Personal</div></div>
+      <div style="flex:1;height:1px;background:var(--border);margin:0 .5rem"><div id="prl1" style="height:1px;background:var(--gold);width:0%;transition:width .3s"></div></div>
+      <div class="rs" id="prs2" style="text-align:center"><div style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);color:var(--gray);display:flex;align-items:center;justify-content:center;font-size:.85rem;margin:0 auto .3rem">2</div><div style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Físico</div></div>
+      <div style="flex:1;height:1px;background:var(--border);margin:0 .5rem"><div id="prl2" style="height:1px;background:var(--gold);width:0%;transition:width .3s"></div></div>
+      <div class="rs" id="prs3" style="text-align:center"><div style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);color:var(--gray);display:flex;align-items:center;justify-content:center;font-size:.85rem;margin:0 auto .3rem">3</div><div style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Experiencia</div></div>
+      <div style="flex:1;height:1px;background:var(--border);margin:0 .5rem"><div id="prl3" style="height:1px;background:var(--gold);width:0%;transition:width .3s"></div></div>
+      <div class="rs" id="prs4" style="text-align:center"><div style="width:32px;height:32px;border-radius:50%;border:1px solid var(--border);color:var(--gray);display:flex;align-items:center;justify-content:center;font-size:.85rem;margin:0 auto .3rem">4</div><div style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Fotos</div></div>
+    </div>
+
+    <div class="panel" id="pstep1">
+      <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem">Paso 1 de 4</div>
+      <div style="font-size:1.3rem;font-weight:500;margin-bottom:1.5rem">Información Personal &amp; Contacto</div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Nombre Completo *</label><input type="text" class="finput-white" id="pr-nombre" placeholder="Tu nombre legal"></div>
+        <div class="fgroup"><label class="flabel">Nombre Artístico</label><input type="text" class="finput-white" id="pr-artistico" placeholder="Como te conocen"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Fecha de Nacimiento</label><input type="date" class="finput-white" id="pr-fecha"></div>
+        <div class="fgroup"><label class="flabel">Edad *</label><input type="number" class="finput-white" id="pr-edad" placeholder="Años"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Ciudad de Residencia *</label><input type="text" class="finput-white" id="pr-ciudad" placeholder="Ej: Medellín"></div>
+        <div class="fgroup"><label class="flabel">Nacionalidad</label><input type="text" class="finput-white" id="pr-nacion" placeholder="Ej: Colombiana"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">WhatsApp *</label><input type="tel" class="finput-white" id="pr-wa" placeholder="+57 300 000 0000"></div>
+        <div class="fgroup"><label class="flabel">Correo Electrónico *</label><input type="email" class="finput-white" id="pr-email" placeholder="tu@correo.com"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Instagram</label><input type="text" class="finput-white" id="pr-ig" placeholder="@usuario"></div>
+        <div class="fgroup"><label class="flabel">TikTok</label><input type="text" class="finput-white" id="pr-tt" placeholder="@usuario"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:1.2rem"><label class="flabel">Idiomas</label>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem" id="pr-idiomas">
+          <button type="button" class="ptog" data-val="Español">Español</button>
+          <button type="button" class="ptog" data-val="Inglés">Inglés</button>
+          <button type="button" class="ptog" data-val="Portugués">Portugués</button>
+          <button type="button" class="ptog" data-val="Francés">Francés</button>
+          <button type="button" class="ptog" data-val="Italiano">Italiano</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end"><button class="fbtn" onclick="pNextStep(1)">Siguiente →</button></div>
+    </div>
+
+    <div class="panel" id="pstep2" style="display:none">
+      <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem">Paso 2 de 4</div>
+      <div style="font-size:1.3rem;font-weight:500;margin-bottom:1.5rem">Características Físicas</div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Estatura (cm) *</label><input type="number" class="finput-white" id="pr-estatura" placeholder="Ej: 170"></div>
+        <div class="fgroup"><label class="flabel">Talla de Ropa</label>
+          <select class="finput-white" id="pr-talla"><option value="">Seleccionar</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option></select>
+        </div>
+      </div>
+      <div class="fgrid3" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Busto (cm)</label><input type="number" class="finput-white" id="pr-busto" placeholder="88"></div>
+        <div class="fgroup"><label class="flabel">Cintura (cm)</label><input type="number" class="finput-white" id="pr-cintura" placeholder="62"></div>
+        <div class="fgroup"><label class="flabel">Cadera (cm)</label><input type="number" class="finput-white" id="pr-cadera" placeholder="92"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Color de Cabello</label>
+          <select class="finput-white" id="pr-cabello"><option value="">Seleccionar</option><option>Negro</option><option>Castaño</option><option>Rubio</option><option>Rojo</option><option>Otro</option></select>
+        </div>
+        <div class="fgroup"><label class="flabel">Color de Ojos</label>
+          <select class="finput-white" id="pr-ojos"><option value="">Seleccionar</option><option>Cafés</option><option>Verdes</option><option>Azules</option><option>Grises</option><option>Negros</option></select>
+        </div>
+      </div>
+      <div class="fgroup" style="margin-bottom:.9rem;max-width:220px"><label class="flabel">Talla de Calzado (EU)</label><input type="number" class="finput-white" id="pr-calzado" placeholder="Ej: 37"></div>
+      <div class="fgroup" style="margin-bottom:1.2rem">
+        <label class="flabel">¿Tiene Tatuajes?</label>
+        <input type="text" class="finput-white" id="pr-tat-input" placeholder="Ej: Antebrazo derecho — presiona Enter" onkeydown="pAddTat(event)">
+        <div id="ptat-tags" style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem"></div>
+        <label style="display:flex;align-items:center;gap:.6rem;margin-top:.7rem;font-size:.78rem;color:var(--gray);cursor:pointer"><input type="checkbox" id="pr-no-tat" onchange="pNoTat(this)"> Sin tatuajes</label>
+      </div>
+      <div style="display:flex;justify-content:space-between"><button class="fbtn-outline" onclick="pPrevStep(2)">← Anterior</button><button class="fbtn" onclick="pNextStep(2)">Siguiente →</button></div>
+    </div>
+
+    <div class="panel" id="pstep3" style="display:none">
+      <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem">Paso 3 de 4</div>
+      <div style="font-size:1.3rem;font-weight:500;margin-bottom:1.5rem">Experiencia &amp; Disponibilidad</div>
+      <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Categorías</label>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem" id="pr-categorias">
+          <button type="button" class="ptog" data-val="Comercial">Comercial</button>
+          <button type="button" class="ptog" data-val="Fashion">Fashion</button>
+          <button type="button" class="ptog" data-val="Urbana">Urbana</button>
+          <button type="button" class="ptog" data-val="Fitness">Fitness</button>
+          <button type="button" class="ptog" data-val="Editorial">Editorial</button>
+          <button type="button" class="ptog" data-val="Swimwear">Swimwear</button>
+          <button type="button" class="ptog" data-val="Presentadora">Presentadora</button>
+          <button type="button" class="ptog" data-val="Actriz">Actriz</button>
+        </div>
+      </div>
+      <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Marcas con las que ha Trabajado</label><textarea class="finput-white" id="pr-marcas" placeholder="Ej: Leonisa, Studio F..."></textarea></div>
+      <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Videos Musicales en los que ha Participado</label><textarea class="finput-white" id="pr-videos" placeholder="Artista / sello / año..."></textarea></div>
+      <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Experiencia General</label><textarea class="finput-white" id="pr-exp" style="min-height:100px" placeholder="Trayectoria, proyectos, pasarelas..."></textarea></div>
+      <div class="fgroup" style="margin-bottom:1.2rem"><label class="flabel">Disponibilidad</label>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem" id="pr-disponibilidad">
+          <button type="button" class="ptog" data-val="Disponible para viajar">✈ Disponible para viajar</button>
+          <button type="button" class="ptog" data-val="Pasaporte vigente">🪪 Pasaporte vigente</button>
+          <button type="button" class="ptog" data-val="Proyectos internacionales">🌐 Proyectos internacionales</button>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between"><button class="fbtn-outline" onclick="pPrevStep(3)">← Anterior</button><button class="fbtn" onclick="pNextStep(3)">Siguiente →</button></div>
+    </div>
+
+    <div class="panel" id="pstep4" style="display:none">
+      <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem">Paso 4 de 4</div>
+      <div style="font-size:1.3rem;font-weight:500;margin-bottom:.8rem">Material Fotográfico</div>
+      <p style="font-size:.82rem;color:var(--gray);margin-bottom:1.2rem">Sube tus fotos directamente aquí. Rostro y cuerpo completo son obligatorias; puedes agregar hasta 2 fotos adicionales.</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.2rem">
+        <div data-pslot="rostro">
+          <input type="file" accept="image/*" id="prfile-rostro" hidden>
+          <div class="preg-photo-box" style="aspect-ratio:3/4;border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('prfile-rostro').click()">
+            <span style="font-size:1.6rem;color:var(--gray2)">+</span><small style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray2);margin-top:.3rem">Rostro *</small>
+          </div>
+        </div>
+        <div data-pslot="cuerpo">
+          <input type="file" accept="image/*" id="prfile-cuerpo" hidden>
+          <div class="preg-photo-box" style="aspect-ratio:3/4;border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('prfile-cuerpo').click()">
+            <span style="font-size:1.6rem;color:var(--gray2)">+</span><small style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray2);margin-top:.3rem">Cuerpo *</small>
+          </div>
+        </div>
+        <div data-pslot="extra1">
+          <input type="file" accept="image/*" id="prfile-extra1" hidden>
+          <div class="preg-photo-box" style="aspect-ratio:3/4;border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('prfile-extra1').click()">
+            <span style="font-size:1.6rem;color:var(--gray2)">+</span><small style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray2);margin-top:.3rem">Adicional</small>
+          </div>
+        </div>
+        <div data-pslot="extra2">
+          <input type="file" accept="image/*" id="prfile-extra2" hidden>
+          <div class="preg-photo-box" style="aspect-ratio:3/4;border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden" onclick="document.getElementById('prfile-extra2').click()">
+            <span style="font-size:1.6rem;color:var(--gray2)">+</span><small style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray2);margin-top:.3rem">Adicional</small>
+          </div>
+        </div>
+      </div>
+      <div class="fgroup" style="margin-bottom:1.2rem"><label class="flabel">Video de Presentación (Opcional)</label><input type="url" class="finput-white" id="pr-video" placeholder="https://drive.google.com/... o YouTube"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="fbtn-outline" onclick="pPrevStep(4)">← Anterior</button>
+        <button class="fbtn" id="preg-submit-btn" onclick="pEnviarRegistro()">📲 Enviar Registro</button>
+      </div>
+      <div class="fstatus" id="preg-status" style="text-align:center"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-name">AG ELITE MODELS</div>
+      <div class="sb-logo-sub">Panel de Gestión</div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-av">?</div>
+      <div>
+        <div class="sb-user-name" id="sb-name">—</div>
+        <div class="sb-user-role" id="sb-role">—</div>
+      </div>
+    </div>
+    <div id="sidebar-links"></div>
+    <div class="sb-bottom">
+      <button class="sb-logout" onclick="doLogout()">
+        <span class="icon">↩</span> Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><span id="tb-section">Dashboard</span></div>
+      <div class="topbar-right">
+        <button class="topbar-btn" onclick="refreshData()">↻ Actualizar datos</button>
+        <a href="/" style="font-size:.72rem;color:var(--gray);letter-spacing:.08em;text-transform:uppercase">← Volver al sitio</a>
+      </div>
+    </div>
+    <div class="content" id="main-content"></div>
+  </div>
+</div>
+
+<script>
+const SB='https://vzgzalcvkzttsrjlisfs.supabase.co';
+const SK='sb_publishable_bek0hK20motWCQ4a5qznEA_GmyXhs93';
+const SH={'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json','Prefer':'return=minimal'};
+const RESEND_KEY='re_MKvgBCCr_6zFDpDz5ZtAZVHAShYnxMzvt';
+const FROM='noreply@agelitemodel.com';
+const SITE='https://agelitemodels.netlify.app';
+
+async function sbQ(t,f=''){try{const r=await fetch(`${SB}/rest/v1/${t}?select=*${f?'&'+f:''}`,{headers:{'apikey':SK,'Authorization':'Bearer '+SK}});return r.ok?await r.json():[];}catch(e){return[];}}
+async function sbI(t,row){
+  try{
+    const r=await fetch(`${SB}/rest/v1/${t}`,{method:'POST',headers:{...SH,'Prefer':'return=representation'},body:JSON.stringify(row)});
+    if(!r.ok){
+      const err=await r.text();
+      console.error('sbI error ['+t+']:',r.status,err);
+      window._lastSbError=err;
+      return false;
+    }
+    return true;
+  }catch(e){
+    console.error('sbI exception ['+t+']:',e);
+    window._lastSbError=e.message;
+    return false;
+  }
+}
+async function sbU(t,f,body){try{const r=await fetch(`${SB}/rest/v1/${t}?${f}`,{method:'PATCH',headers:SH,body:JSON.stringify(body)});return r.ok;}catch(e){return false;}}
+
+function hash(s){let h=0;for(let i=0;i<s.length;i++)h=Math.imul(31,h)+s.charCodeAt(i)|0;return Math.abs(h).toString(16);}
+
+/* ============ DINERO / COMISIÓN ============ */
+function fmtCOP(n){n=Number(n)||0;return '$ '+Math.round(n).toLocaleString('es-CO');}
+function montoNeto(c){
+  const total=parseFloat(c.valor_total)||0;
+  const com=parseFloat(c.comision_porcentaje)||0;
+  return total*(1-com/100);
+}
+
+/* ============ CONTEO ANIMADO EN MÉTRICAS ============ */
+function animateCounts(){
+  document.querySelectorAll('.metric-val[data-count]').forEach(el=>{
+    const target=parseInt(el.dataset.count,10)||0;
+    const dur=600,start=performance.now();
+    function step(now){
+      const p=Math.min(1,(now-start)/dur);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=Math.round(eased*target);
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* ============ GRÁFICA DE BARRAS (SVG, sin librerías) ============ */
+function svgBarChart(bars,opts={}){
+  const w=opts.width||520, h=opts.height||180, pad=30;
+  const max=Math.max(1,...bars.map(b=>b.value));
+  const bw=(w-pad*2)/bars.length;
+  const barsHtml=bars.map((b,i)=>{
+    const bh=Math.max(2,(b.value/max)*(h-50));
+    const x=pad+i*bw+bw*0.18;
+    const bwi=bw*0.64;
+    const y=h-30-bh;
+    return `<rect x="${x}" y="${y}" width="${bwi}" height="${bh}" fill="${b.color||'#C8A55A'}" rx="2"></rect>
+      <text x="${x+bwi/2}" y="${y-6}" text-anchor="middle" font-size="11" fill="#fff" font-family="Inter,sans-serif">${b.value}</text>
+      <text x="${x+bwi/2}" y="${h-12}" text-anchor="middle" font-size="9.5" fill="rgba(255,255,255,.5)" font-family="Inter,sans-serif">${b.label}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:${h}px" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${pad}" y1="${h-30}" x2="${w-pad}" y2="${h-30}" stroke="rgba(255,255,255,.12)"></line>
+    ${barsHtml}
+  </svg>`;
+}
+
+let _session=null, _tipo=null, _tab='dashboard', _ltab='modelo';
+
+/* ============ LOGIN — PILL TABS ============ */
+let _pillTab='ingresar';
+function setPillTab(t){
+  _pillTab=t;
+  document.getElementById('pt-ingresar').style.background=t==='ingresar'?'var(--white)':'transparent';
+  document.getElementById('pt-ingresar').style.color=t==='ingresar'?'var(--bg)':'var(--gray)';
+  document.getElementById('pt-registrarse').style.background=t==='registrarse'?'var(--white)':'transparent';
+  document.getElementById('pt-registrarse').style.color=t==='registrarse'?'var(--bg)':'var(--gray)';
+  if(t==='ingresar') renderIngresarForm();
+  else renderRoleCards();
+}
+
+function renderIngresarForm(){
+  document.getElementById('pill-content').innerHTML=`
+    <div class="fgroup"><label class="flabel">Tipo de Acceso</label>
+      <div style="display:flex;gap:.4rem" id="ltipo-toggle">
+        <button type="button" class="ptog sel" data-val="modelo" onclick="setLTipo('modelo',this)" style="flex:1;text-align:center;font-size:.7rem">Modelo</button>
+        <button type="button" class="ptog" data-val="cliente" onclick="setLTipo('cliente',this)" style="flex:1;text-align:center;font-size:.7rem">Cliente</button>
+        <button type="button" class="ptog" data-val="admin" onclick="setLTipo('admin',this)" style="flex:1;text-align:center;font-size:.7rem">Admin</button>
+      </div>
+    </div>
+    <div id="ltipo-fields">
+      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finput" id="l-email" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fgroup"><label class="flabel">Contraseña</label><input type="password" class="finput" id="l-pw" placeholder="Tu contraseña" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    </div>
+    <button class="fbtn" style="width:100%;margin-top:.5rem" onclick="doLogin()">Ingresar →</button>
+    <div class="fstatus" id="l-st"></div>
+    <div id="ltipo-extra" style="text-align:center;margin-top:1rem">
+      <button onclick="showForgot()" style="background:none;border:none;color:var(--gray);font-size:.72rem;cursor:pointer;text-decoration:underline;font-family:var(--ff)">Olvidé mi contraseña</button>
+    </div>
+    <div id="ltipo-reglink" style="text-align:center;margin-top:.8rem;font-size:.78rem;color:var(--gray)">¿Primera vez? <button onclick="setPillTab('registrarse')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.78rem;text-decoration:underline;font-family:var(--ff)">Regístrate aquí</button></div>`;
+}
+function setLTipo(t,btn){
+  _ltab=t;
+  document.querySelectorAll('#ltipo-toggle .ptog').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const fields=document.getElementById('ltipo-fields');
+  const extra=document.getElementById('ltipo-extra');
+  const reglink=document.getElementById('ltipo-reglink');
+  if(t==='admin'){
+    fields.innerHTML=`<div class="fgroup"><label class="flabel">Clave de Acceso</label><input type="password" class="finput" id="l-pw" placeholder="Clave de administrador" onkeydown="if(event.key==='Enter')doLogin()"></div>`;
+    extra.style.display='none';
+    reglink.style.display='none';
+  } else {
+    fields.innerHTML=`
+      <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finput" id="l-email" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fgroup"><label class="flabel">Contraseña</label><input type="password" class="finput" id="l-pw" placeholder="Tu contraseña" onkeydown="if(event.key==='Enter')doLogin()"></div>`;
+    extra.style.display='block';
+    reglink.style.display=t==='cliente'?'block':'none';
+  }
+}
+
+function renderRoleCards(){
+  document.getElementById('pill-content').innerHTML=`
+    <div style="text-align:center;font-size:.85rem;color:var(--gray);margin-bottom:1.2rem">¿Cómo quieres unirte a AG Elite Models?</div>
+    <div class="role-card" onclick="showRegModelo()" style="display:flex;align-items:center;gap:1rem;padding:1.1rem;border:1px solid var(--border);border-radius:12px;cursor:pointer;margin-bottom:.8rem;transition:all .2s">
+      <div style="width:44px;height:44px;border-radius:10px;background:rgba(200,165,90,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">💃</div>
+      <div style="flex:1">
+        <div style="font-size:.92rem;font-weight:600">Soy Modelo</div>
+        <div style="font-size:.76rem;color:var(--gray)">Regístrate y postúlate a campañas</div>
+      </div>
+      <div style="color:var(--gray)">›</div>
+    </div>
+    <div class="role-card" onclick="setPillTab('ingresar');document.getElementById('pill-content').innerHTML='';showRegCliente()" style="display:flex;align-items:center;gap:1rem;padding:1.1rem;border:1px solid var(--border);border-radius:12px;cursor:pointer;margin-bottom:.8rem;transition:all .2s">
+      <div style="width:44px;height:44px;border-radius:10px;background:rgba(200,165,90,.15);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">🎬</div>
+      <div style="flex:1">
+        <div style="font-size:.92rem;font-weight:600">Soy Cliente / Artista</div>
+        <div style="font-size:.76rem;color:var(--gray)">Crea tu cuenta y arma campañas</div>
+      </div>
+      <div style="color:var(--gray)">›</div>
+    </div>
+    <div style="text-align:center;margin-top:1.2rem;font-size:.78rem;color:var(--gray)">¿Ya tienes cuenta? <button onclick="setPillTab('ingresar')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:.78rem;text-decoration:underline;font-family:var(--ff)">Ingresa aquí</button></div>`;
+  document.querySelectorAll('.role-card').forEach(c=>{
+    c.addEventListener('mouseenter',()=>c.style.borderColor='var(--gold)');
+    c.addEventListener('mouseleave',()=>c.style.borderColor='var(--border)');
+  });
+}
+
+const ADMIN_PW='AGElite2026';
+async function doLogin(){
+  const pw=document.getElementById('l-pw').value;
+  const st=document.getElementById('l-st');
+  if(_ltab==='admin'){
+    if(!pw){st.className='fstatus err';st.textContent='Ingresa la clave de acceso.';return;}
+    if(pw!==ADMIN_PW){st.className='fstatus err';st.textContent='Clave incorrecta.';return;}
+    _session={};_tipo='admin';
+    initApp();
+    return;
+  }
+  const email=document.getElementById('l-email').value.trim().toLowerCase();
+  if(!email||!pw){st.className='fstatus err';st.textContent='Completa email y contraseña.';return;}
+  st.className='fstatus info';st.textContent='Verificando...';
+  const h=hash(pw);
+  if(_ltab==='modelo'){
+    const rows=await sbQ('models','email=eq.'+encodeURIComponent(email)+'&status=eq.aprobada');
+    if(!rows.length){st.className='fstatus err';st.textContent='Email no encontrado o perfil no aprobado.';return;}
+    const m=rows[0];
+    if(!m.password_hash){
+      await sbU('models','id=eq.'+encodeURIComponent(m.id),{password_hash:h});
+      m.password_hash=h;
+    }
+    if(m.password_hash!==h){st.className='fstatus err';st.textContent='Contraseña incorrecta.';return;}
+    _session=m;_tipo='modelo';
+  } else {
+    const rows=await sbQ('clientes','email=eq.'+encodeURIComponent(email)+'&plataforma=eq.ag_elite_models');
+    if(!rows.length){st.className='fstatus err';st.textContent='Email no encontrado.';return;}
+    const c=rows[0];
+    if(!c.password_hash){
+      await sbU('clientes','id=eq.'+encodeURIComponent(c.id),{password_hash:h});
+      c.password_hash=h;
+    }
+    if(c.password_hash!==h){st.className='fstatus err';st.textContent='Contraseña incorrecta.';return;}
+    _session=c;_tipo='cliente';
+  }
+  initApp();
+}
+
+/* ============ SWITCH LOGIN / REGISTRO MODELO ============ */
+function showRegModelo(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('reg-modelo-screen').style.display='block';
+  window.scrollTo(0,0);
+}
+function showLoginScreen(){
+  document.getElementById('reg-modelo-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+/* ============ TOGGLE GROUPS (idiomas, categorias, disponibilidad) ============ */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('.ptog');
+  if(btn) btn.classList.toggle('sel');
+});
+
+/* ============ PASOS DEL REGISTRO ============ */
+let _pStep=1;
+function pNextStep(step){
+  if(step===1){
+    const nombre=document.getElementById('pr-nombre').value.trim();
+    const edad=document.getElementById('pr-edad').value;
+    const ciudad=document.getElementById('pr-ciudad').value.trim();
+    const wa=document.getElementById('pr-wa').value.trim();
+    const email=document.getElementById('pr-email').value.trim();
+    if(!nombre||!edad||!ciudad||!wa||!email){alert('Completa los campos obligatorios (*) antes de continuar.');return;}
+  }
+  if(step===2){
+    const est=document.getElementById('pr-estatura').value;
+    if(!est){alert('Ingresa tu estatura para continuar.');return;}
+  }
+  document.getElementById('pstep'+step).style.display='none';
+  document.getElementById('pstep'+(step+1)).style.display='block';
+  const circle1=document.getElementById('prs'+step).querySelector('div');
+  circle1.style.borderColor='var(--gold)';circle1.style.color='var(--gold)';
+  const circle2=document.getElementById('prs'+(step+1)).querySelector('div');
+  circle2.style.borderColor='var(--gold)';circle2.style.color='var(--gold)';
+  const line=document.getElementById('prl'+step);
+  if(line) line.style.width='100%';
+  _pStep=step+1;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function pPrevStep(step){
+  document.getElementById('pstep'+step).style.display='none';
+  document.getElementById('pstep'+(step-1)).style.display='block';
+  _pStep=step-1;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============ TATUAJES ============ */
+let _pTats=[];
+function pAddTat(e){
+  if(e.key!=='Enter') return;
+  e.preventDefault();
+  const input=document.getElementById('pr-tat-input');
+  const val=input.value.trim();
+  if(!val) return;
+  _pTats.push(val);
+  input.value='';
+  renderPTats();
+}
+function renderPTats(){
+  document.getElementById('ptat-tags').innerHTML=_pTats.map((t,i)=>
+    `<span class="tat-tag-p">${t}<button onclick="removePTat(${i})">×</button></span>`
+  ).join('');
+}
+function removePTat(i){_pTats.splice(i,1);renderPTats();}
+function pNoTat(cb){
+  const input=document.getElementById('pr-tat-input');
+  if(cb.checked){input.disabled=true;input.value='';_pTats=[];renderPTats();}
+  else{input.disabled=false;}
+}
+
+/* ============ FOTOS: COMPRESIÓN + WATERMARK ============ */
+let regPhotosP={rostro:null,cuerpo:null,extra1:null,extra2:null};
+
+function pAddWatermark(ctx,w,h){
+  ctx.save();
+  const text='AG ELITE MODELS';
+  const fsize=Math.max(10,Math.round(w*0.026));
+  ctx.font=`600 ${fsize}px Inter, sans-serif`;
+  ctx.textAlign='right';ctx.textBaseline='bottom';
+  const padX=w*0.035,padY=h*0.025;
+  ctx.fillStyle='rgba(0,0,0,0.32)';
+  ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.lineWidth=1.5;
+  ctx.strokeText(text,w-padX,h-padY);
+  ctx.fillStyle='rgba(255,255,255,0.82)';
+  ctx.fillText(text,w-padX,h-padY);
+  ctx.restore();
+}
+function pCompressImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=480;
+        const scale=Math.min(1,maxW/img.width);
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.round(img.width*scale);
+        canvas.height=Math.round(img.height*scale);
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        pAddWatermark(ctx,canvas.width,canvas.height);
+        resolve(canvas.toDataURL('image/jpeg',0.62));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+['rostro','cuerpo','extra1','extra2'].forEach(slot=>{
+  document.addEventListener('DOMContentLoaded',()=>{
+    const input=document.getElementById('prfile-'+slot);
+    if(!input) return;
+    input.addEventListener('change',async e=>{
+      const file=e.target.files[0];
+      if(!file) return;
+      if(file.size>8*1024*1024){alert('La imagen es muy pesada (máx 8MB)');return;}
+      const compressed=await pCompressImage(file);
+      regPhotosP[slot]=compressed;
+      const box=document.querySelector(`[data-pslot="${slot}"] .preg-photo-box`);
+      box.innerHTML=`<img src="${compressed}" style="width:100%;height:100%;object-fit:cover;object-position:top">`;
+    });
+  });
+});
+
+/* ============ ENVIAR REGISTRO MODELO ============ */
+async function pEnviarRegistro(){
+  const btn=document.getElementById('preg-submit-btn');
+  const status=document.getElementById('preg-status');
+  if(!regPhotosP.rostro||!regPhotosP.cuerpo){
+    status.className='fstatus err';status.textContent='Las fotos de Rostro y Cuerpo son obligatorias.';
+    return;
+  }
+  btn.disabled=true;btn.textContent='Enviando...';
+  status.className='fstatus info';status.textContent='Guardando tu registro...';
+
+  const idiomas=[...document.querySelectorAll('#pr-idiomas .ptog.sel')].map(b=>b.dataset.val).join(', ');
+  const categorias=[...document.querySelectorAll('#pr-categorias .ptog.sel')].map(b=>b.dataset.val);
+  const disp=[...document.querySelectorAll('#pr-disponibilidad .ptog.sel')].map(b=>b.dataset.val);
+  const sinTat=document.getElementById('pr-no-tat').checked;
+  const tatuajes=sinTat?'No':(_pTats.length?'Sí: '+_pTats.join(', '):'No especificado');
+  const busto=document.getElementById('pr-busto').value;
+  const cintura=document.getElementById('pr-cintura').value;
+  const cadera=document.getElementById('pr-cadera').value;
+  const fotos=[regPhotosP.rostro,regPhotosP.cuerpo,regPhotosP.extra1,regPhotosP.extra2].filter(Boolean);
+
+  const id='app_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+  const data={
+    id,
+    nombre_completo:document.getElementById('pr-nombre').value.trim(),
+    nombre_artistico:document.getElementById('pr-artistico').value.trim(),
+    edad:document.getElementById('pr-edad').value,
+    ciudad:document.getElementById('pr-ciudad').value.trim(),
+    nacionalidad:document.getElementById('pr-nacion').value.trim(),
+    idiomas,
+    whatsapp:document.getElementById('pr-wa').value.trim(),
+    email:document.getElementById('pr-email').value.trim(),
+    instagram:document.getElementById('pr-ig').value.trim(),
+    tiktok:document.getElementById('pr-tt').value.trim(),
+    estatura:document.getElementById('pr-estatura').value,
+    medidas:(busto&&cintura&&cadera)?(busto+'-'+cintura+'-'+cadera):'',
+    cabello:document.getElementById('pr-cabello').value,
+    ojos:document.getElementById('pr-ojos').value,
+    talla_ropa:document.getElementById('pr-talla').value,
+    talla_calzado:document.getElementById('pr-calzado').value,
+    tatuajes,
+    categorias,
+    marcas:document.getElementById('pr-marcas').value.trim(),
+    videoclips:document.getElementById('pr-videos').value.trim(),
+    experiencia:document.getElementById('pr-exp').value.trim(),
+    disponible_viajar:disp.includes('Disponible para viajar'),
+    pasaporte:disp.includes('Pasaporte vigente'),
+    internacional:disp.includes('Proyectos internacionales'),
+    video_presentacion:document.getElementById('pr-video').value.trim(),
+    fotos,
+    status:'pendiente',
+    submitted_at:Date.now()
+  };
+
+  const ok=await sbI('models',data);
+  if(ok){
+    document.getElementById('reg-modelo-screen').innerHTML=`
+      <div style="max-width:520px;margin:0 auto;padding:6rem 1.5rem;text-align:center">
+        <div style="width:72px;height:72px;border-radius:50%;background:var(--green);color:#fff;font-size:2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 2rem">✓</div>
+        <div style="font-family:var(--ffh);font-size:2.2rem;margin-bottom:1rem">Registro Enviado</div>
+        <p style="color:var(--gray);line-height:1.7">Gracias por aplicar a AG Elite Models. Nuestro equipo revisará tu perfil y te contactará por WhatsApp si avanzas en el proceso.</p>
+        <button class="fbtn" style="margin-top:2rem" onclick="location.reload()">Volver al Login</button>
+      </div>`;
+  } else {
+    btn.disabled=false;btn.textContent='📲 Enviar Registro';
+    status.className='fstatus err';status.textContent='Hubo un error al enviar. Intenta de nuevo.';
+  }
+}
+
+
+function showForgot(){
+  document.getElementById('pill-content').innerHTML=`<div style="font-size:.82rem;font-weight:500;margin-bottom:.4rem">Recuperar contraseña</div><div style="font-size:.75rem;color:var(--gray);margin-bottom:1rem">Te enviaremos un link al email para crear nueva contraseña.</div>
+    <div class="fgroup"><label class="flabel">Tu Email</label><input type="email" class="finput" id="f-email" placeholder="tu@correo.com"></div>
+    <button class="fbtn" style="width:100%" onclick="doForgot()">Enviar Link</button>
+    <div class="fstatus" id="f-st"></div>
+    <div style="text-align:center;margin-top:1rem"><button onclick="renderIngresarForm()" style="background:none;border:none;color:var(--gray);font-size:.72rem;cursor:pointer;text-decoration:underline;font-family:var(--ff)">← Volver</button></div>`;
+}
+
+async function doForgot(){
+  const email=document.getElementById('f-email').value.trim().toLowerCase();
+  const st=document.getElementById('f-st');
+  if(!email){st.className='fstatus err';st.textContent='Ingresa tu email.';return;}
+  st.className='fstatus info';st.textContent='Enviando...';
+  const m=await sbQ('models','email=eq.'+encodeURIComponent(email));
+  const c=await sbQ('clientes','email=eq.'+encodeURIComponent(email)+'&plataforma=eq.ag_elite_models');
+  if(!m.length&&!c.length){st.className='fstatus err';st.textContent='Email no encontrado.';return;}
+  const tipo=m.length?'modelo':'cliente';
+  const token=Math.random().toString(36).slice(2)+Date.now().toString(36);
+  const id='ml_'+Date.now();
+  await sbI('magic_links',{id,email,tipo,token,used:false,created_at:Date.now(),expires_at:Date.now()+30*60*1000});
+  const link=`${SITE}/panel.html?ml=${token}`;
+  try{
+    await fetch('https://api.resend.com/emails',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+RESEND_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({
+        from:FROM,to:[email],
+        subject:'Recupera tu acceso — AG Elite Models',
+        html:`<div style="font-family:sans-serif;background:#0f0f0f;color:#fff;padding:2rem;max-width:480px;margin:0 auto"><div style="color:#C8A55A;font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem">AG Elite Models</div><h2 style="margin:0 0 1rem">Recuperar contraseña</h2><p style="color:rgba(255,255,255,.6);margin-bottom:2rem">Haz clic para ingresar y cambiar tu contraseña. Válido por 30 minutos.</p><a href="${link}" style="background:#C8A55A;color:#0a0a0a;padding:.9rem 2rem;text-decoration:none;font-weight:700;font-size:13px;display:inline-block">INGRESAR →</a></div>`
+      })
+    });
+    st.className='fstatus ok';st.textContent='✓ Link enviado. Revisa tu correo.';
+  }catch(e){st.className='fstatus err';st.textContent='Error al enviar. Contacta la agencia por WhatsApp.';}
+}
+
+function showRegCliente(){
+  document.getElementById('pill-content').innerHTML=`
+    <div style="margin-bottom:1.2rem;font-size:.82rem;font-weight:500">Crear Cuenta de Cliente</div>
+    <div class="fgrid2" style="margin-bottom:.9rem">
+      <div class="fgroup"><label class="flabel">Nombre *</label><input type="text" class="finput" id="r-nombre" placeholder="Tu nombre"></div>
+      <div class="fgroup"><label class="flabel">Empresa</label><input type="text" class="finput" id="r-empresa" placeholder="Marca o proyecto"></div>
+    </div>
+    <div class="fgroup"><label class="flabel">Tipo *</label>
+      <select class="finput" id="r-tipo"><option value="">Selecciona</option><option>Artista / Músico</option><option>Productora</option><option>Marca / Empresa</option><option>Fotógrafo / Director</option><option>Otro</option></select>
+    </div>
+    <div class="fgrid2" style="margin-bottom:.9rem">
+      <div class="fgroup"><label class="flabel">WhatsApp</label><input type="tel" class="finput" id="r-wa" placeholder="+57 300 000 0000"></div>
+      <div class="fgroup"><label class="flabel">Email *</label><input type="email" class="finput" id="r-email" placeholder="tu@correo.com"></div>
+    </div>
+    <div class="fgroup"><label class="flabel">Contraseña *</label><input type="password" class="finput" id="r-pw" placeholder="Mínimo 6 caracteres"></div>
+    <button class="fbtn" style="width:100%" onclick="doRegCliente()">Crear Cuenta</button>
+    <div class="fstatus" id="r-st"></div>
+    <div style="text-align:center;margin-top:1rem"><button onclick="renderIngresarForm()" style="background:none;border:none;color:var(--gray);font-size:.72rem;cursor:pointer;text-decoration:underline;font-family:var(--ff)">← Ya tengo cuenta</button></div>`;
+}
+
+async function doRegCliente(){
+  const nombre=document.getElementById('r-nombre').value.trim();
+  const empresa=document.getElementById('r-empresa').value.trim();
+  const tipo=document.getElementById('r-tipo').value;
+  const wa=document.getElementById('r-wa').value.trim();
+  const email=document.getElementById('r-email').value.trim().toLowerCase();
+  const pw=document.getElementById('r-pw').value;
+  const st=document.getElementById('r-st');
+  if(!nombre||!email||!tipo||!pw){st.className='fstatus err';st.textContent='Completa los campos obligatorios.';return;}
+  if(pw.length<6){st.className='fstatus err';st.textContent='La contraseña debe tener al menos 6 caracteres.';return;}
+  st.className='fstatus info';st.textContent='Creando cuenta...';
+  const existing=await sbQ('clientes','email=eq.'+encodeURIComponent(email)+'&plataforma=eq.ag_elite_models');
+  if(existing.length){st.className='fstatus err';st.textContent='Este email ya está registrado.';return;}
+  const id='cli_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  const ok=await sbI('clientes',{id,nombre,empresa,tipo,whatsapp:wa,email,password_hash:hash(pw),status:'activo',plataforma:'ag_elite_models',created_at:Date.now()});
+  if(!ok){st.className='fstatus err';st.textContent='Error al crear cuenta.';return;}
+  _session={id,nombre,empresa,tipo,whatsapp:wa,email};_tipo='cliente';
+  initApp();
+}
+
+/* ============ CHECK MAGIC LINK ============ */
+async function checkML(){
+  const p=new URLSearchParams(window.location.search);
+  const token=p.get('ml');
+  if(!token) return false;
+  const rows=await sbQ('magic_links','token=eq.'+encodeURIComponent(token));
+  const ml=rows[0];
+  if(!ml||ml.used||Date.now()>ml.expires_at) return false;
+  await sbU('magic_links','token=eq.'+encodeURIComponent(token),{used:true});
+  window.history.replaceState({},'',window.location.pathname);
+  if(ml.tipo==='modelo'){
+    const m=await sbQ('models','email=eq.'+encodeURIComponent(ml.email));
+    if(m[0]){_session=m[0];_tipo='modelo';return true;}
+  } else {
+    const c=await sbQ('clientes','email=eq.'+encodeURIComponent(ml.email)+'&plataforma=eq.ag_elite_models');
+    if(c[0]){_session=c[0];_tipo='cliente';return true;}
+  }
+  return false;
+}
+
+/* ============ INIT APP ============ */
+async function initApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='grid';
+  // Set sidebar user info
+  const name=_tipo==='modelo'?(_session.nombre_artistico||_session.nombre_completo):_tipo==='admin'?'Admin':_session.nombre;
+  document.getElementById('sb-name').textContent=name||'Usuario';
+  document.getElementById('sb-av').textContent=(name||'?')[0].toUpperCase();
+  document.getElementById('sb-role').textContent=_tipo==='modelo'?'Modelo':_tipo==='admin'?'Administrador':'Cliente / Artista';
+  renderSidebar();
+  navTo('dashboard');
+}
+
+function doLogout(){
+  _session=null;_tipo=null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  setPillTab('ingresar');
+}
+
+function refreshData(){navTo(_tab);}
+
+/* ============ SIDEBAR ============ */
+function renderSidebar(){
+  const links = _tipo==='modelo' ? [
+    {id:'dashboard',icon:'📊',label:'Dashboard'},
+    {id:'campanas',icon:'🎯',label:'Campañas Disponibles'},
+    {id:'postulaciones',icon:'📋',label:'Mis Postulaciones'},
+    {id:'perfil',icon:'👤',label:'Mi Perfil'},
+    {id:'editar-perfil',icon:'✏️',label:'Editar Perfil'},
+    {id:'cuenta-cobro',icon:'🧾',label:'Cuenta de Cobro'},
+  ] : _tipo==='cliente' ? [
+    {id:'dashboard',icon:'📊',label:'Dashboard'},
+    {id:'mis-campanas',icon:'🎬',label:'Mis Campañas'},
+    {id:'nueva-campana',icon:'➕',label:'Nueva Campaña'},
+    {id:'perfil',icon:'👤',label:'Mi Perfil'},
+  ] : [
+    {id:'dashboard',icon:'📊',label:'Dashboard'},
+    {id:'adm-pendientes',icon:'⏳',label:'Pendientes'},
+    {id:'adm-fotos',icon:'📸',label:'Pedir Fotos'},
+    {id:'adm-aprobadas',icon:'✅',label:'Aprobadas'},
+    {id:'adm-rechazadas',icon:'✗',label:'Rechazadas'},
+    {id:'adm-orden',icon:'⬍',label:'Orden Portada'},
+    {id:'adm-campanas',icon:'🎯',label:'Campañas'},
+    {id:'adm-cuentas',icon:'🧾',label:'Cuentas de Cobro'},
+  ];
+  document.getElementById('sidebar-links').innerHTML=`
+    <div class="sb-section">Principal</div>
+    ${links.map(l=>`<button class="sb-link${_tab===l.id?' active':''}" onclick="navTo('${l.id}')"><span class="icon">${l.icon}</span>${l.label}</button>`).join('')}`;
+}
+
+function navTo(tab){
+  _tab=tab;
+  renderSidebar();
+  document.getElementById('tb-section').textContent=document.querySelector(`.sb-link[onclick*="${tab}"]`)?.textContent?.trim()||tab;
+  const mc=document.getElementById('main-content');
+  mc.style.animation='none';void mc.offsetWidth;mc.style.animation='';
+  if(tab==='dashboard') renderDashboard();
+  else if(tab==='campanas') renderCampanas();
+  else if(tab==='postulaciones') renderPostulaciones();
+  else if(tab==='perfil') renderPerfil();
+  else if(tab==='editar-perfil') renderEditarPerfil();
+  else if(tab==='cuenta-cobro') renderCuentaCobro();
+  else if(tab==='mis-campanas') renderMisCampanas();
+  else if(tab==='nueva-campana') renderNuevaCampana();
+  else if(tab==='adm-pendientes') renderAdmModelos('pendiente');
+  else if(tab==='adm-fotos') renderAdmModelos('pendiente-fotos');
+  else if(tab==='adm-aprobadas') renderAdmModelos('aprobada');
+  else if(tab==='adm-rechazadas') renderAdmModelos('rechazada');
+  else if(tab==='adm-orden') renderAdmOrden();
+  else if(tab==='adm-campanas') renderAdmCampanas();
+  else if(tab==='adm-cuentas') renderAdmCuentas();
+}
+
+/* ============ DASHBOARD ============ */
+async function renderDashboard(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div style="color:var(--gray);padding:2rem;text-align:center">Cargando datos...</div>`;
+
+  if(_tipo==='admin'){
+    const rows=await sbQ('models');
+    const pend=rows.filter(m=>m.status==='pendiente').length;
+    const fotos=rows.filter(m=>m.status==='pendiente-fotos').length;
+    const aprob=rows.filter(m=>m.status==='aprobada').length;
+    const camps=await sbQ('campanas','plataforma=eq.ag_elite_models');
+    const campPend=camps.filter(c=>c.status==='pendiente').length;
+    const ccs=await sbQ('cuentas_cobro','order=created_at.desc&limit=5');
+    const recientes=rows.sort((a,b)=>(b.submitted_at||0)-(a.submitted_at||0)).slice(0,5);
+    el.innerHTML=`
+      <div class="metrics">
+        <div class="metric-card"><div class="metric-label">Pendientes de revisión</div><div class="metric-val" data-count="${pend}">0</div><div class="metric-sub neutral">Nuevas aplicaciones</div></div>
+        <div class="metric-card"><div class="metric-label">Esperando fotos</div><div class="metric-val" data-count="${fotos}">0</div><div class="metric-sub neutral">Book solicitado</div></div>
+        <div class="metric-card"><div class="metric-label">Modelos aprobadas</div><div class="metric-val" data-count="${aprob}">0</div><div class="metric-sub up">✓ Catálogo activo</div></div>
+        <div class="metric-card"><div class="metric-label">Campañas pendientes</div><div class="metric-val" data-count="${campPend}">0</div><div class="metric-sub neutral">Por aprobar</div></div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Aplicaciones recientes</div><button class="fbtn-outline" onclick="navTo('adm-pendientes')" style="font-size:.68rem;padding:.4rem .8rem">Ver todas</button></div>
+          ${recientes.length?recientes.map(m=>`
+            <div class="activity-item">
+              <div class="activity-dot ${m.status==='pendiente'?'new':''}"></div>
+              <div><div class="activity-text">${m.nombre_artistico||m.nombre_completo||'Modelo'}</div>
+              <div class="activity-time"><span class="badge ${m.status==='pendiente-fotos'?'pendiente':m.status}">${m.status}</span></div></div>
+            </div>`).join(''):`<div class="empty"><div class="empty-icon">✦</div>Sin aplicaciones aún</div>`}
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Cuentas de cobro recientes</div><button class="fbtn-outline" onclick="navTo('adm-cuentas')" style="font-size:.68rem;padding:.4rem .8rem">Ver todas</button></div>
+          ${ccs.length?ccs.map(cc=>`
+            <div class="activity-item">
+              <div class="activity-dot new"></div>
+              <div><div class="activity-text">#${cc.numero} — $${Number(cc.valor).toLocaleString('es-CO')}</div>
+              <div class="activity-time">${cc.fecha}</div></div>
+            </div>`).join(''):`<div class="empty"><div class="empty-icon">🧾</div>Ninguna generada aún</div>`}
+        </div>
+      </div>`;
+    animateCounts();
+    return;
+  }
+
+  if(_tipo==='modelo'){
+    const posts=await sbQ('postulaciones','modelo_id=eq.'+_session.id);
+    const aprobadas=posts.filter(p=>p.status==='aprobada');
+    const pendientes=posts.filter(p=>p.status==='pendiente');
+    const camps=await sbQ('campanas','status=eq.aprobada&plataforma=eq.ag_elite_models');
+    const activity=await sbQ('postulaciones','modelo_id=eq.'+_session.id+'&order=created_at.desc&limit=5');
+    const campIds=[...new Set(activity.map(p=>p.campana_id))];
+    const campsMap=campIds.length?(await sbQ('campanas','id=in.('+campIds.map(i=>`"${i}"`).join(',')+')')):[];
+    const cm=Object.fromEntries(campsMap.map(c=>[c.id,c]));
+
+    el.innerHTML=`
+      <div class="metrics">
+        <div class="metric-card"><div class="metric-label">Postulaciones totales</div><div class="metric-val" data-count="${posts.length}">0</div><div class="metric-sub neutral">Todas las campañas</div></div>
+        <div class="metric-card"><div class="metric-label">Seleccionada</div><div class="metric-val" data-count="${aprobadas.length}">0</div><div class="metric-sub up">✓ Confirmadas</div></div>
+        <div class="metric-card"><div class="metric-label">En revisión</div><div class="metric-val" data-count="${pendientes.length}">0</div><div class="metric-sub neutral">Esperando respuesta</div></div>
+        <div class="metric-card"><div class="metric-label">Campañas activas</div><div class="metric-val" data-count="${camps.length}">0</div><div class="metric-sub up">↑ Disponibles ahora</div></div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Actividad reciente</div></div>
+          ${activity.length?activity.map(p=>`
+            <div class="activity-item">
+              <div class="activity-dot new"></div>
+              <div><div class="activity-text">Postulación a <b>${cm[p.campana_id]?.titulo||'campaña'}</b></div>
+              <div class="activity-time"><span class="badge ${p.status}">${p.status}</span></div></div>
+            </div>`).join(''):`<div class="empty"><div class="empty-icon">✦</div>Sin actividad aún</div>`}
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Mi Perfil</div></div>
+          <div style="text-align:center;padding:1rem">
+            ${_session.fotos&&_session.fotos[0]?`<div style="width:80px;height:96px;overflow:hidden;margin:0 auto .8rem;background:var(--bg3)"><img src="${_session.fotos[0]}" style="width:100%;height:100%;object-fit:cover;object-position:top"></div>`:'<div style="width:60px;height:60px;border-radius:50%;background:var(--gold-d);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:600;margin:0 auto .8rem">'+((_session.nombre_artistico||'?')[0])+'</div>'}
+            <div style="font-size:.9rem;font-weight:500;margin-bottom:.2rem">${_session.nombre_artistico||_session.nombre_completo}</div>
+            <div style="font-size:.72rem;color:var(--gray);margin-bottom:.8rem">${_session.ciudad||''}</div>
+            <span class="badge aprobada">✓ Aprobada</span>
+            ${_session.nivel?`<div style="margin-top:.5rem"><span class="badge" style="background:rgba(200,165,90,.2);color:var(--gold)">${_session.nivel}</span></div>`:''}
+          </div>
+          <button class="fbtn-outline" style="width:100%;margin-top:1rem" onclick="navTo('campanas')">Ver Campañas →</button>
+        </div>
+      </div>`;
+    animateCounts();
+
+  } else {
+    // Cliente dashboard
+    const camps=await sbQ('campanas','cliente_id=eq.'+_session.id+'&plataforma=eq.ag_elite_models');
+    const allPost=camps.length?await sbQ('postulaciones','campana_id=in.('+camps.map(c=>`"${c.id}"`).join(',')+')'):[];
+    const aprobadas=camps.filter(c=>c.status==='aprobada');
+    const pendientes=camps.filter(c=>c.status==='pendiente');
+    const rechazadas=camps.filter(c=>c.status==='rechazada');
+    const recentPost=allPost.slice().sort((a,b)=>b.created_at-a.created_at).slice(0,5);
+    const modelIds=[...new Set(recentPost.map(p=>p.modelo_id))];
+    const models=modelIds.length?await sbQ('models','id=in.('+modelIds.map(i=>`"${i}"`).join(',')+')'):[]; 
+    const mm=Object.fromEntries(models.map(m=>[m.id,m]));
+
+    const facturado=camps.reduce((s,c)=>s+(Number(c.valor_total)||0),0);
+    const pagado=camps.filter(c=>c.pago_estado==='pagado').reduce((s,c)=>s+(Number(c.valor_total)||0),0);
+    const pendientePago=facturado-pagado;
+    const pctPagado=facturado?Math.round(pagado/facturado*100):0;
+
+    el.innerHTML=`
+      <div class="metrics">
+        <div class="metric-card"><div class="metric-label">Campañas creadas</div><div class="metric-val" data-count="${camps.length}">0</div><div class="metric-sub neutral">Total</div></div>
+        <div class="metric-card"><div class="metric-label">Campañas aprobadas</div><div class="metric-val" data-count="${aprobadas.length}">0</div><div class="metric-sub up">✓ Activas</div></div>
+        <div class="metric-card"><div class="metric-label">Postulaciones recibidas</div><div class="metric-val" data-count="${allPost.length}">0</div><div class="metric-sub up">↑ De modelos</div></div>
+        <div class="metric-card"><div class="metric-label">En revisión</div><div class="metric-val" data-count="${pendientes.length}">0</div><div class="metric-sub neutral">Esperando aprobación</div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Campañas por estado</div></div>
+          ${svgBarChart([
+            {label:'Creadas',value:camps.length,color:'#8a8a8a'},
+            {label:'Aprobadas',value:aprobadas.length,color:'#4caf7d'},
+            {label:'Revisión',value:pendientes.length,color:'#d4aa50'},
+            {label:'Rechazadas',value:rechazadas.length,color:'#e74c3c'}
+          ])}
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Pagos</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem">
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Facturado</div><div style="font-size:1.1rem;font-weight:600">${fmtCOP(facturado)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Pagado</div><div style="font-size:1.1rem;font-weight:600;color:#4caf7d">${fmtCOP(pagado)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Pendiente</div><div style="font-size:1.1rem;font-weight:600;color:var(--gold)">${fmtCOP(pendientePago)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">% Pagado</div><div style="font-size:1.1rem;font-weight:600">${pctPagado}%</div></div>
+          </div>
+          <div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden"><div class="pay-progress-fill" style="height:100%;width:${pctPagado}%;background:#4caf7d"></div></div>
+          <button class="fbtn-outline" style="width:100%;margin-top:1rem" onclick="navTo('mis-campanas')">Ir a Mis Campañas →</button>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Postulaciones recientes</div><button class="fbtn-outline" onclick="navTo('mis-campanas')" style="font-size:.68rem;padding:.4rem .8rem">Ver todo</button></div>
+          ${recentPost.length?`<table class="tbl"><thead><tr><th>Modelo</th><th>Campaña</th><th>Estado</th></tr></thead><tbody>
+          ${recentPost.map(p=>{
+            const m=mm[p.modelo_id]||{};
+            const c=camps.find(x=>x.id===p.campana_id)||{};
+            return `<tr><td>${m.nombre_artistico||m.nombre_completo||p.modelo_id.slice(0,10)+'...'}</td><td style="color:var(--gray)">${c.titulo||'—'}</td><td><span class="badge ${p.status}">${p.status}</span></td></tr>`;
+          }).join('')}
+          </tbody></table>`:`<div class="empty"><div class="empty-icon">✦</div>Aún no hay postulaciones</div>`}
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Actividad reciente</div></div>
+          ${camps.slice(0,5).map(c=>`
+            <div class="activity-item">
+              <div class="activity-dot ${c.status==='aprobada'?'new':''}"></div>
+              <div><div class="activity-text">${c.titulo}</div>
+              <div class="activity-time"><span class="badge ${c.status}">${c.status}</span></div></div>
+            </div>`).join('')||`<div class="empty"><div class="empty-icon">✦</div>Sin campañas aún</div>`}
+          <button class="fbtn" style="width:100%;margin-top:1rem" onclick="navTo('nueva-campana')">+ Nueva Campaña</button>
+        </div>
+      </div>`;
+    animateCounts();
+  }
+}
+
+/* ============ CAMPAÑAS (MODELO) ============ */
+async function renderCampanas(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const camps=await sbQ('campanas','status=eq.aprobada&plataforma=eq.ag_elite_models&order=created_at.desc');
+  const posts=await sbQ('postulaciones','modelo_id=eq.'+_session.id);
+  const postIds=new Set(posts.map(p=>p.campana_id));
+  el.innerHTML=`
+    <div style="margin-bottom:1.5rem">
+      <div style="font-size:.85rem;font-weight:500;margin-bottom:.3rem">Campañas Disponibles</div>
+      <div style="font-size:.75rem;color:var(--gray)">${camps.length} campaña(s) activa(s)</div>
+    </div>
+    ${camps.length?camps.map(c=>`
+      <div class="panel" style="margin-bottom:1rem;cursor:pointer" onclick="verCampanaModelo('${c.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:1rem;margin-bottom:1rem">
+          <div>
+            <div style="font-size:.9rem;font-weight:500;margin-bottom:.3rem">${c.titulo}</div>
+            <div style="font-size:.72rem;color:var(--gray)">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
+          </div>
+          <div onclick="event.stopPropagation()">
+          ${postIds.has(c.id)?'<span class="badge aprobada">✓ Postulada</span>':
+            `<button id="postbtn-${c.id}" onclick="abrirPost('${c.id}','${c.titulo.replace(/'/g,"\\'")}',this)" style="background:var(--gold);color:var(--bg);border:none;padding:.5rem 1.2rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Postularme</button>`}
+          </div>
+        </div>
+        ${c.descripcion?`<p style="font-size:.8rem;color:var(--gray);line-height:1.6;margin-bottom:.8rem">${c.descripcion}</p>`:''}
+        ${c.perfil_buscado?`<div style="font-size:.75rem;color:var(--gray2)"><b style="color:rgba(255,255,255,.6)">Perfil:</b> ${c.perfil_buscado}</div>`:''}
+        ${c.valor_total?`<div style="font-size:.75rem;color:var(--gold);margin-top:.3rem">💰 ${fmtCOP(montoNeto(c))}</div>`:''}
+        <div style="display:flex;gap:1.5rem;margin-top:.8rem;font-size:.72rem;color:var(--gray2)">
+          ${c.transporte?'✈ Transporte':''}${c.alimentacion?' 🍽 Alimentación':''}${c.vestuario?' 👗 Vestuario':''}
+        </div>
+        <div style="font-size:.68rem;color:var(--gray2);margin-top:.6rem">Ver detalle completo →</div>
+        <div id="post-form-${c.id}" onclick="event.stopPropagation()"></div>
+      </div>`).join(''):`<div class="empty" style="padding:4rem"><div class="empty-icon">✦</div>No hay campañas disponibles por el momento.</div>`}`;
+}
+
+/* ============ DETALLE DE CAMPAÑA (MODELO) ============ */
+async function verCampanaModelo(id){
+  const camps=await sbQ('campanas','id=eq.'+encodeURIComponent(id));
+  const c=camps[0]; if(!c) return;
+  const posts=await sbQ('postulaciones','modelo_id=eq.'+_session.id+'&campana_id=eq.'+encodeURIComponent(id));
+  const yaPostulada=posts.length>0;
+  const neto=montoNeto(c);
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:5500;background:rgba(0,0,0,.92);overflow-y:auto;padding:2rem';
+  overlay.innerHTML=`
+    <div style="max-width:640px;margin:0 auto;background:#111;border:1px solid var(--border);padding:2rem;color:#fff;position:relative">
+      <button onclick="this.closest('[style*=z-index]').remove()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer">✕</button>
+      <div style="font-size:1.3rem;font-weight:600;margin-bottom:.2rem">${c.titulo}</div>
+      <div style="font-size:.78rem;color:var(--gray);margin-bottom:1.2rem">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.horario?' · '+c.horario:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
+      ${c.perfil_buscado?`<div style="font-size:.8rem;margin-bottom:.6rem"><b style="color:rgba(255,255,255,.6)">Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
+      ${c.descripcion?`<p style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-bottom:1rem">${c.descripcion}</p>`:''}
+      <div style="display:flex;gap:1.5rem;margin-bottom:1rem;font-size:.78rem;color:var(--gray2)">
+        ${c.transporte?'✈ Transporte incluido':''}${c.alimentacion?' 🍽 Alimentación incluida':''}${c.vestuario?' 👗 Vestuario incluido':''}
+      </div>
+      <div style="background:rgba(200,165,90,.08);border:1px solid rgba(200,165,90,.25);padding:1rem;margin-bottom:1.2rem">
+        <div style="font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray)">Tu pago por este proyecto</div>
+        <div style="font-size:1.5rem;font-weight:600;color:var(--gold)">${c.valor_total?fmtCOP(neto):'Por confirmar'}</div>
+      </div>
+      ${yaPostulada?`<span class="badge aprobada" style="display:inline-block">✓ Ya te postulaste a esta campaña</span>`:
+        `<button onclick="document.getElementById('postbtn-${c.id}')?.click();this.closest('[style*=z-index]').remove();" style="background:var(--gold);color:var(--bg);border:none;padding:.6rem 1.4rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Postularme</button>`}
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function abrirPost(campId,titulo,btn){
+  const form=document.getElementById('post-form-'+campId);
+  if(form.innerHTML){form.innerHTML='';return;}
+  btn.style.opacity='.5';
+  form.innerHTML=`
+    <div style="margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--border)">
+      <div class="fgroup"><label class="flabel">Mensaje (opcional)</label>
+        <textarea class="finput" id="pmsg-${campId}" placeholder="Cuéntale al cliente por qué eres perfecta para este proyecto..." style="min-height:80px;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:.8rem">
+        <button onclick="enviarPost('${campId}')" style="background:var(--gold);color:var(--bg);border:none;padding:.6rem 1.4rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Enviar Postulación</button>
+        <button onclick="this.closest('[id^=post-form]').innerHTML=''" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.6rem 1rem;font-size:.72rem;cursor:pointer;font-family:var(--ff)">Cancelar</button>
+      </div>
+      <div class="fstatus" id="pst-${campId}"></div>
+    </div>`;
+}
+
+async function enviarPost(campId){
+  const msg=document.getElementById('pmsg-'+campId)?.value.trim();
+  const st=document.getElementById('pst-'+campId);
+  if(st) {st.className='fstatus info';st.textContent='Enviando...';}
+  const id='post_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  const ok=await sbI('postulaciones',{id,campana_id:campId,modelo_id:_session.id,mensaje:msg,status:'pendiente',created_at:Date.now()});
+  if(ok){if(st){st.className='fstatus ok';st.textContent='✓ Postulación enviada correctamente.';}setTimeout(()=>renderCampanas(),1500);}
+  else{if(st){st.className='fstatus err';st.textContent='Error. Intenta de nuevo.';}}
+}
+
+/* ============ POSTULACIONES (MODELO) ============ */
+async function renderPostulaciones(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const posts=await sbQ('postulaciones','modelo_id=eq.'+_session.id+'&order=created_at.desc');
+  if(!posts.length){el.innerHTML='<div class="empty" style="padding:4rem"><div class="empty-icon">📋</div>Aún no te has postulado a ninguna campaña.</div>';return;}
+  const campIds=posts.map(p=>p.campana_id);
+  const camps=await sbQ('campanas','id=in.('+campIds.map(i=>`"${i}"`).join(',')+')')
+  const cm=Object.fromEntries(camps.map(c=>[c.id,c]));
+  el.innerHTML=`<table class="tbl" style="width:100%">
+    <thead><tr><th>Campaña</th><th>Tipo</th><th>Fecha</th><th>Tu mensaje</th><th>Estado</th><th></th></tr></thead>
+    <tbody>
+    ${posts.map(p=>{
+      const c=cm[p.campana_id]||{};
+      return `<tr>
+        <td style="font-weight:500">${c.titulo||'—'}</td>
+        <td style="color:var(--gray)">${c.tipo||'—'}</td>
+        <td style="color:var(--gray)">${c.fecha||'—'}</td>
+        <td style="color:var(--gray);font-size:.75rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.mensaje||'—'}</td>
+        <td><span class="badge ${p.status}">${p.status==='pendiente'?'⏳ Revisión':p.status==='aprobada'?'✓ Seleccionada':'✗ No seleccionada'}</span></td>
+        <td>${c.id?`<button onclick="verCampanaModelo('${c.id}')" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.3rem .7rem;font-size:.66rem;cursor:pointer;font-family:var(--ff)">Ver →</button>`:''}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+}
+
+/* ============ MIS CAMPAÑAS (CLIENTE) ============ */
+async function renderMisCampanas(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const camps=await sbQ('campanas','cliente_id=eq.'+_session.id+'&plataforma=eq.ag_elite_models&order=created_at.desc');
+  if(!camps.length){
+    el.innerHTML=`<div class="empty" style="padding:4rem"><div class="empty-icon">🎬</div>No tienes campañas aún.<br><button class="fbtn" style="margin-top:1.5rem" onclick="navTo('nueva-campana')">+ Crear Campaña</button></div>`;return;
+  }
+  const allPost=await sbQ('postulaciones','campana_id=in.('+camps.map(c=>`"${c.id}"`).join(',')+')'
+  );
+  const pb={};allPost.forEach(p=>{if(!pb[p.campana_id])pb[p.campana_id]=[];pb[p.campana_id].push(p);});
+  const modelIds=[...new Set(allPost.map(p=>p.modelo_id))];
+  const models=modelIds.length?await sbQ('models','id=in.('+modelIds.map(i=>`"${i}"`).join(',')+')'):[]; 
+  const mm=Object.fromEntries(models.map(m=>[m.id,m]));
+
+  el.innerHTML=camps.map(c=>{
+    const posts=pb[c.id]||[];
+    return `<div class="panel" style="margin-bottom:1.2rem">
+      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:1rem;margin-bottom:1rem">
+        <div>
+          <div style="font-size:.95rem;font-weight:500;margin-bottom:.3rem">${c.titulo}</div>
+          <div style="font-size:.72rem;color:var(--gray)">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
+        </div>
+        <span class="badge ${c.status}">${c.status==='pendiente'?'⏳ En revisión':c.status==='aprobada'?'✓ Aprobada':'✗ Rechazada'}</span>
+      </div>
+      ${c.perfil_buscado?`<div style="font-size:.78rem;color:var(--gray);margin-bottom:.4rem"><b style="color:rgba(255,255,255,.5)">Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
+      ${c.pago?`<div style="font-size:.78rem;color:var(--gold);margin-bottom:.8rem">💰 <b>Pago:</b> ${c.pago}</div>`:''}
+      ${c.status==='aprobada'&&c.valor_total?`
+        <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);padding:.8rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem">
+          <div>
+            <span class="badge ${c.pago_estado==='pagado'?'aprobada':'pendiente'}">${c.pago_estado==='pagado'?'✓ Pagada':'⏳ Pago pendiente'}</span>
+            <span style="font-size:.72rem;color:var(--gray);margin-left:.6rem">${fmtCOP(c.valor_total)}</span>
+          </div>
+          ${c.pago_estado==='pagado'?'':`<button onclick="iniciarPago('${c.id}',this)" style="background:var(--gold);color:var(--bg);border:none;padding:.5rem 1.1rem;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Pagar con Mercado Pago</button>`}
+        </div>`:''}
+      <div style="border-top:1px solid var(--border);padding-top:1rem">
+        <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2);margin-bottom:.8rem">Postulaciones (${posts.length})</div>
+        ${posts.length===0?'<div style="font-size:.8rem;color:var(--gray2)">Aún no hay postulaciones para esta campaña.</div>':
+          posts.map(p=>{
+            const m=mm[p.modelo_id]||{};
+            return `<div style="display:flex;align-items:center;gap:1rem;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.04);flex-wrap:wrap">
+              ${m.fotos&&m.fotos[0]?`<div class="model-foto"><img src="${m.fotos[0]}" style="object-position:center ${mFotoPos(m.fotos_pos,0)}%"></div>`:'<div style="width:44px;height:44px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem">'+(m.nombre_artistico||'?')[0]+'</div>'}
+              <div style="flex:1;min-width:120px">
+                <div style="font-size:.85rem;font-weight:500">${m.nombre_artistico||m.nombre_completo||'Modelo'}</div>
+                <div style="font-size:.72rem;color:var(--gray)">${m.ciudad||''} ${m.nivel?'· '+m.nivel:''}</div>
+                ${p.mensaje?`<div style="font-size:.72rem;color:var(--gray2);font-style:italic;margin-top:.2rem">"${p.mensaje.slice(0,60)}${p.mensaje.length>60?'...':''}"</div>`:''}
+              </div>
+              <div style="display:flex;gap:.4rem">
+                ${p.status==='pendiente'?`
+                  <button onclick="gestPost('${p.id}','aprobada','${m.id}')" style="background:var(--green);color:#fff;border:none;padding:.4rem .9rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--ff)">✓ Seleccionar</button>
+                  <button onclick="gestPost('${p.id}','rechazada','')" style="background:none;border:1px solid var(--red);color:var(--red);padding:.4rem .7rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)">✗</button>`:
+                  `<span class="badge ${p.status}">${p.status==='aprobada'?'✓ Seleccionada':'✗ No seleccionada'}</span>`}
+              </div>
+            </div>`;
+          }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function gestPost(postId,status,modeloId){
+  await sbU('postulaciones','id=eq.'+postId,{status});
+  if(status==='aprobada'&&modeloId){
+    const models=await sbQ('models','id=eq.'+modeloId);
+    if(models[0]){
+      const m=models[0];
+      const wa=(m.whatsapp||'').replace(/[^0-9]/g,'');
+      if(wa){const msg=`Hola ${m.nombre_artistico||m.nombre_completo}! 🎉\n\nFuiste seleccionada para una campaña en AG Elite Models. Nuestro equipo se pondrá en contacto contigo pronto. ¡Felicitaciones! ✨`;window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');}
+    }
+  }
+  renderMisCampanas();
+}
+
+/* ============ NUEVA CAMPAÑA ============ */
+function renderNuevaCampana(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`
+    <div style="max-width:680px">
+      <div style="font-size:.95rem;font-weight:500;margin-bottom:.3rem">Nueva Campaña</div>
+      <div style="font-size:.75rem;color:var(--gray);margin-bottom:2rem">La campaña será revisada antes de publicarse a las modelos.</div>
+      <div class="fgroup"><label class="flabel">Título *</label><input type="text" class="finput-white" id="nc-t" placeholder="Ej: Videoclip Urbano — Agosto 2026"></div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Tipo *</label>
+          <select class="finput-white" id="nc-tipo"><option value="">Selecciona</option><option>Videoclip</option><option>Campaña publicitaria</option><option>Sesión de fotos</option><option>Evento corporativo</option><option>Contenido UGC</option><option>Producción audiovisual</option><option>Otro</option></select>
+        </div>
+        <div class="fgroup"><label class="flabel">Fecha</label><input type="date" class="finput-white" id="nc-f"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Ciudad y ubicación</label><input type="text" class="finput-white" id="nc-c" placeholder="Medellín, estudio..."></div>
+        <div class="fgrid2">
+          <div class="fgroup"><label class="flabel">Horario</label><input type="text" class="finput-white" id="nc-h" placeholder="8am–4pm"></div>
+          <div class="fgroup"><label class="flabel">N° modelos</label><input type="number" class="finput-white" id="nc-n" placeholder="1" min="1"></div>
+        </div>
+      </div>
+      <div class="fgroup"><label class="flabel">Perfil buscado</label><input type="text" class="finput-white" id="nc-p" placeholder="Morena, 1.65m+, comercial..."></div>
+      <div class="fgroup"><label class="flabel">Descripción del proyecto</label><textarea class="finput-white" id="nc-d" placeholder="Concepto, estética, qué necesitas..."></textarea></div>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:1.5rem 0 1rem">Pago</div>
+      <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Tipo de Pago</label>
+        <div style="display:flex;gap:.5rem" id="nc-tipopago-toggle">
+          <button type="button" class="ptog sel" data-val="fijo" onclick="setTipoPago('fijo',this)" style="flex:1;text-align:center">Valor Fijo</button>
+          <button type="button" class="ptog" data-val="hora" onclick="setTipoPago('hora',this)" style="flex:1;text-align:center">Por Hora</button>
+        </div>
+      </div>
+      <div id="nc-pago-fields">
+        <div class="fgroup" style="margin-bottom:.9rem;max-width:300px"><label class="flabel">Valor Total (COP)</label><input type="number" class="finput-white" id="nc-valorfijo" placeholder="800000" oninput="calcularPago()"></div>
+      </div>
+      <div id="nc-pago-total" style="display:none;margin-bottom:1.2rem;padding:.9rem 1.1rem;background:rgba(200,165,90,.1);border:1px solid rgba(200,165,90,.3)">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Total Calculado</div>
+        <div style="font-size:1.3rem;font-weight:600;color:var(--gold)" id="nc-pago-valor">$ 0</div>
+      </div>
+
+      <div class="fgrid3" style="margin-bottom:1.5rem">
+        <div class="fgroup"><label class="flabel">Transporte</label><select class="finput-white" id="nc-tr"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+        <div class="fgroup"><label class="flabel">Alimentación</label><select class="finput-white" id="nc-al"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+        <div class="fgroup"><label class="flabel">Vestuario</label><select class="finput-white" id="nc-ve"><option value="">—</option><option>Sí</option><option>No</option></select></div>
+      </div>
+      <button class="fbtn" onclick="crearCampana()">Enviar para Revisión</button>
+      <div class="fstatus" id="nc-st"></div>
+    </div>`;
+}
+
+let _tipoPago='fijo';
+function setTipoPago(t,btn){
+  _tipoPago=t;
+  document.querySelectorAll('#nc-tipopago-toggle .ptog').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const fields=document.getElementById('nc-pago-fields');
+  if(t==='fijo'){
+    fields.innerHTML=`<div class="fgroup" style="margin-bottom:.9rem;max-width:300px"><label class="flabel">Valor Total (COP)</label><input type="number" class="finput-white" id="nc-valorfijo" placeholder="800000" oninput="calcularPago()"></div>`;
+    document.getElementById('nc-pago-total').style.display='none';
+  } else {
+    fields.innerHTML=`
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Valor por Hora (COP)</label><input type="number" class="finput-white" id="nc-valorhora" placeholder="150000" oninput="calcularPago()"></div>
+        <div class="fgroup"><label class="flabel">Horas Estimadas</label><input type="number" class="finput-white" id="nc-horas" placeholder="4" step="0.5" oninput="calcularPago()"></div>
+      </div>`;
+    calcularPago();
+  }
+}
+function calcularPago(){
+  const totalEl=document.getElementById('nc-pago-total');
+  const valEl=document.getElementById('nc-pago-valor');
+  let total=0;
+  if(_tipoPago==='hora'){
+    const vh=parseFloat(document.getElementById('nc-valorhora')?.value)||0;
+    const hrs=parseFloat(document.getElementById('nc-horas')?.value)||0;
+    total=vh*hrs;
+    totalEl.style.display='block';
+    valEl.textContent='$ '+Math.round(total).toLocaleString('es-CO');
+  } else {
+    totalEl.style.display='none';
+  }
+  return total;
+}
+
+async function crearCampana(){
+  const t=document.getElementById('nc-t').value.trim();
+  const tipo=document.getElementById('nc-tipo').value;
+  const st=document.getElementById('nc-st');
+  if(!t||!tipo){st.className='fstatus err';st.textContent='Completa título y tipo.';return;}
+  st.className='fstatus info';st.textContent='Enviando...';
+  const v=id=>document.getElementById(id)?.value||'';
+  let pagoTexto='', valorHora='', horasEst='', valorTotalNum=0;
+  if(_tipoPago==='fijo'){
+    const vf=v('nc-valorfijo');
+    valorTotalNum=Number(vf)||0;
+    pagoTexto=vf?('$ '+Number(vf).toLocaleString('es-CO')+' (fijo)'):'';
+  } else {
+    valorHora=v('nc-valorhora');horasEst=v('nc-horas');
+    valorTotalNum=calcularPago();
+    pagoTexto=valorTotalNum?('$ '+Math.round(valorTotalNum).toLocaleString('es-CO')+' ('+horasEst+'h x $'+Number(valorHora).toLocaleString('es-CO')+'/h)'):'';
+  }
+  const id='camp_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  const ok=await sbI('campanas',{id,cliente_id:_session.id,titulo:t,tipo,descripcion:v('nc-d'),fecha:v('nc-f'),ciudad:v('nc-c'),horario:v('nc-h'),num_modelos:parseInt(v('nc-n'))||1,perfil_buscado:v('nc-p'),tipo_pago:_tipoPago,valor_hora:valorHora,horas_estimadas:horasEst,pago:pagoTexto,valor_total:valorTotalNum,comision_porcentaje:0,plataforma:'ag_elite_models',transporte:v('nc-tr')==='Sí',alimentacion:v('nc-al')==='Sí',vestuario:v('nc-ve')==='Sí',status:'pendiente',created_at:Date.now()});
+  if(ok){st.className='fstatus ok';st.textContent='✓ Campaña enviada. La revisaremos en menos de 24h.';setTimeout(()=>navTo('mis-campanas'),2000);}
+  else{
+    st.className='fstatus err';
+    let msg='Error al enviar.';
+    try{ const parsed=JSON.parse(window._lastSbError||'{}'); msg='Error: '+(parsed.message||parsed.hint||window._lastSbError); }catch(e){ msg='Error: '+(window._lastSbError||'desconocido'); }
+    st.textContent=msg;
+  }
+}
+
+/* ============ PERFIL ============ */
+function renderPerfil(){
+  const el=document.getElementById('main-content');
+  const s=_session;
+  if(_tipo==='modelo'){
+    el.innerHTML=`
+      <div style="max-width:600px">
+        <div class="panel">
+          <div style="display:flex;gap:1.5rem;align-items:start;flex-wrap:wrap;margin-bottom:1.5rem">
+            ${s.fotos&&s.fotos[0]?`<div style="width:100px;height:120px;overflow:hidden;flex-shrink:0;background:var(--bg3)"><img src="${s.fotos[0]}" style="width:100%;height:100%;object-fit:cover;object-position:top"></div>`:''}
+            <div>
+              <div style="font-size:1.1rem;font-weight:500;margin-bottom:.3rem">${s.nombre_artistico||s.nombre_completo}</div>
+              <div style="font-size:.78rem;color:var(--gray);margin-bottom:.6rem">${s.nombre_completo||''}</div>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+                <span class="badge aprobada">✓ Aprobada</span>
+                ${s.nivel?`<span class="badge" style="background:rgba(200,165,90,.2);color:var(--gold)">${s.nivel}</span>`:''}
+              </div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;font-size:.82rem">
+            ${[['Edad',s.edad?s.edad+' años':''],['Estatura',s.estatura?s.estatura+' cm':''],['Ciudad',s.ciudad],['Email',s.email],['Medidas',s.medidas],['Talla',s.talla_ropa],['Cabello',s.cabello],['Ojos',s.ojos]].filter(([,v])=>v).map(([l,v])=>`<div><div style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray2);margin-bottom:.2rem">${l}</div>${v}</div>`).join('')}
+          </div>
+          ${(s.categorias||[]).length?`<div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:.4rem">${(s.categorias||[]).map(c=>`<span style="font-size:.65rem;border:1px solid var(--border);padding:.25rem .65rem;color:var(--gray)">${c}</span>`).join('')}</div>`:''}
+        </div>
+        <div style="margin-top:1rem"><button class="fbtn-outline" onclick="navTo('editar-perfil')">✏️ Editar mi Perfil →</button></div>
+      </div>`;
+  } else {
+    el.innerHTML=`
+      <div style="max-width:500px">
+        <div class="panel">
+          <div style="font-size:1rem;font-weight:500;margin-bottom:1.2rem">${s.nombre}${s.empresa?' — '+s.empresa:''}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;font-size:.82rem">
+            ${[['Tipo',s.tipo],['WhatsApp',s.whatsapp],['Email',s.email]].filter(([,v])=>v).map(([l,v])=>`<div><div style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray2);margin-bottom:.2rem">${l}</div>${v}</div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+/* ============ EDITAR PERFIL (MODELO) ============ */
+let editPhotosP={};
+function renderEditarPerfil(){
+  const s=_session;
+  editPhotosP={rostro:s.fotos&&s.fotos[0]||null,cuerpo:s.fotos&&s.fotos[1]||null,extra1:s.fotos&&s.fotos[2]||null,extra2:s.fotos&&s.fotos[3]||null};
+  const medidas=(s.medidas||'').split('-');
+  const el=document.getElementById('main-content');
+  el.innerHTML=`
+    <div style="max-width:680px">
+      <div style="font-size:.95rem;font-weight:500;margin-bottom:.3rem">Editar mi Perfil</div>
+      <div style="font-size:.75rem;color:var(--gray);margin-bottom:1.5rem">Mantén tu información y fotos actualizadas.</div>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem">Información Personal</div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Nombre Completo</label><input type="text" class="finput-white" id="ep-nombre" value="${s.nombre_completo||''}"></div>
+        <div class="fgroup"><label class="flabel">Nombre Artístico</label><input type="text" class="finput-white" id="ep-artistico" value="${s.nombre_artistico||''}"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Edad</label><input type="number" class="finput-white" id="ep-edad" value="${s.edad||''}"></div>
+        <div class="fgroup"><label class="flabel">Ciudad</label><input type="text" class="finput-white" id="ep-ciudad" value="${s.ciudad||''}"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">WhatsApp</label><input type="tel" class="finput-white" id="ep-wa" value="${s.whatsapp||''}"></div>
+        <div class="fgroup"><label class="flabel">Email</label><input type="email" class="finput-white" id="ep-email" value="${s.email||''}"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Instagram</label><input type="text" class="finput-white" id="ep-ig" value="${s.instagram||''}"></div>
+        <div class="fgroup"><label class="flabel">TikTok</label><input type="text" class="finput-white" id="ep-tt" value="${s.tiktok||''}"></div>
+      </div>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:1.5rem 0 1rem">Características Físicas</div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Estatura (cm)</label><input type="number" class="finput-white" id="ep-estatura" value="${s.estatura||''}"></div>
+        <div class="fgroup"><label class="flabel">Talla de Ropa</label>
+          <select class="finput-white" id="ep-talla">
+            ${['','XS','S','M','L','XL'].map(t=>`<option value="${t}"${s.talla_ropa===t?' selected':''}>${t||'Seleccionar'}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="fgrid3" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Busto (cm)</label><input type="number" class="finput-white" id="ep-busto" value="${medidas[0]||''}"></div>
+        <div class="fgroup"><label class="flabel">Cintura (cm)</label><input type="number" class="finput-white" id="ep-cintura" value="${medidas[1]||''}"></div>
+        <div class="fgroup"><label class="flabel">Cadera (cm)</label><input type="number" class="finput-white" id="ep-cadera" value="${medidas[2]||''}"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.9rem">
+        <div class="fgroup"><label class="flabel">Cabello</label><input type="text" class="finput-white" id="ep-cabello" value="${s.cabello||''}"></div>
+        <div class="fgroup"><label class="flabel">Ojos</label><input type="text" class="finput-white" id="ep-ojos" value="${s.ojos||''}"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:1.2rem;max-width:220px"><label class="flabel">Talla Calzado</label><input type="text" class="finput-white" id="ep-calzado" value="${s.talla_calzado||''}"></div>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:1.5rem 0 1rem">Experiencia</div>
+      <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Marcas con las que ha Trabajado</label><textarea class="finput-white" id="ep-marcas">${s.marcas||''}</textarea></div>
+      <div class="fgroup" style="margin-bottom:1.2rem"><label class="flabel">Experiencia General</label><textarea class="finput-white" id="ep-exp" style="min-height:100px">${s.experiencia||''}</textarea></div>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:1.5rem 0 1rem">Fotos · Haz clic sobre una foto para cambiarla</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.5rem">
+        ${['rostro','cuerpo','extra1','extra2'].map((slot,i)=>`
+          <div>
+            <input type="file" accept="image/*" id="epfile-${slot}" hidden>
+            <div id="epbox-${slot}" onclick="document.getElementById('epfile-${slot}').click()" style="aspect-ratio:3/4;border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--bg3)">
+              ${editPhotosP[slot]?`<img src="${editPhotosP[slot]}" style="width:100%;height:100%;object-fit:cover;object-position:top">`:
+              `<span style="font-size:1.6rem;color:var(--gray2)">+</span><small style="font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray2);margin-top:.3rem">${['Rostro','Cuerpo','Extra 1','Extra 2'][i]}</small>`}
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <button class="fbtn" id="ep-save-btn" onclick="guardarEdicionPerfil()">Guardar Cambios</button>
+      <div class="fstatus" id="ep-status"></div>
+    </div>`;
+
+  ['rostro','cuerpo','extra1','extra2'].forEach(slot=>{
+    document.getElementById('epfile-'+slot).addEventListener('change',async e=>{
+      const file=e.target.files[0];
+      if(!file) return;
+      if(file.size>8*1024*1024){alert('La imagen es muy pesada (máx 8MB)');return;}
+      const compressed=await pCompressImage(file);
+      editPhotosP[slot]=compressed;
+      document.getElementById('epbox-'+slot).innerHTML=`<img src="${compressed}" style="width:100%;height:100%;object-fit:cover;object-position:top">`;
+    });
+  });
+}
+
+async function guardarEdicionPerfil(){
+  const btn=document.getElementById('ep-save-btn');
+  const status=document.getElementById('ep-status');
+  btn.disabled=true;btn.textContent='Guardando...';
+  status.className='fstatus info';status.textContent='Actualizando tu perfil...';
+  const busto=document.getElementById('ep-busto').value;
+  const cintura=document.getElementById('ep-cintura').value;
+  const cadera=document.getElementById('ep-cadera').value;
+  const fotos=['rostro','cuerpo','extra1','extra2'].map(s=>editPhotosP[s]).filter(Boolean);
+  const updates={
+    nombre_completo:document.getElementById('ep-nombre').value.trim(),
+    nombre_artistico:document.getElementById('ep-artistico').value.trim(),
+    edad:document.getElementById('ep-edad').value,
+    ciudad:document.getElementById('ep-ciudad').value.trim(),
+    whatsapp:document.getElementById('ep-wa').value.trim(),
+    email:document.getElementById('ep-email').value.trim(),
+    instagram:document.getElementById('ep-ig').value.trim(),
+    tiktok:document.getElementById('ep-tt').value.trim(),
+    estatura:document.getElementById('ep-estatura').value,
+    talla_ropa:document.getElementById('ep-talla').value,
+    medidas:(busto&&cintura&&cadera)?(busto+'-'+cintura+'-'+cadera):'',
+    cabello:document.getElementById('ep-cabello').value.trim(),
+    ojos:document.getElementById('ep-ojos').value.trim(),
+    talla_calzado:document.getElementById('ep-calzado').value.trim(),
+    marcas:document.getElementById('ep-marcas').value.trim(),
+    experiencia:document.getElementById('ep-exp').value.trim(),
+    fotos
+  };
+  const ok=await sbU('models','id=eq.'+encodeURIComponent(_session.id),updates);
+  btn.disabled=false;btn.textContent='Guardar Cambios';
+  if(ok){
+    Object.assign(_session,updates);
+    status.className='fstatus ok';status.textContent='✓ Perfil actualizado correctamente.';
+  } else {
+    status.className='fstatus err';status.textContent='Error al guardar. Intenta de nuevo.';
+  }
+}
+
+/* ============ CUENTA DE COBRO (MODELO) ============ */
+async function renderCuentaCobro(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const misCC=await sbQ('cuentas_cobro','modelo_id=eq.'+_session.id+'&order=created_at.desc');
+  const aprobadas=(await sbQ('postulaciones','modelo_id=eq.'+_session.id+'&status=eq.aprobada'));
+  const campIds=aprobadas.map(p=>p.campana_id);
+  const camps=campIds.length?await sbQ('campanas','id=in.('+campIds.map(i=>`"${i}"`).join(',')+')'):[]; 
+
+  el.innerHTML=`
+    <div class="grid2">
+      <div>
+        <div class="panel">
+          <div style="font-size:.9rem;font-weight:500;margin-bottom:1.2rem">Generar Cuenta de Cobro</div>
+          <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Campaña (opcional)</label>
+            <select class="finput-white" id="cc-campana">
+              <option value="">Otro / No listada</option>
+              ${camps.map(c=>`<option value="${c.id}">${c.titulo}</option>`).join('')}
+            </select>
+          </div>
+          <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Cédula de Ciudadanía *</label><input type="text" class="finput-white" id="cc-cedula" placeholder="1234567890" value="${_session.cedula||''}"></div>
+          <div class="fgroup" style="margin-bottom:.9rem"><label class="flabel">Concepto / Servicio *</label><textarea class="finput-white" id="cc-concepto" placeholder="Ej: Servicios prestados como modelo en producción de video musical el día..."></textarea></div>
+          <div class="fgrid2" style="margin-bottom:.9rem">
+            <div class="fgroup"><label class="flabel">Valor (COP) *</label><input type="number" class="finput-white" id="cc-valor" placeholder="800000"></div>
+            <div class="fgroup"><label class="flabel">Fecha del servicio *</label><input type="date" class="finput-white" id="cc-fecha" value="${new Date().toISOString().slice(0,10)}"></div>
+          </div>
+          <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:1.2rem 0 .8rem">Datos Bancarios</div>
+          <div class="fgrid2" style="margin-bottom:.9rem">
+            <div class="fgroup"><label class="flabel">Banco *</label><input type="text" class="finput-white" id="cc-banco" placeholder="Bancolombia"></div>
+            <div class="fgroup"><label class="flabel">Tipo de Cuenta *</label>
+              <select class="finput-white" id="cc-tipocuenta"><option value="Ahorros">Ahorros</option><option value="Corriente">Corriente</option></select>
+            </div>
+          </div>
+          <div class="fgrid2" style="margin-bottom:.9rem">
+            <div class="fgroup"><label class="flabel">N° de Cuenta *</label><input type="text" class="finput-white" id="cc-numcuenta" placeholder="0000000000"></div>
+            <div class="fgroup"><label class="flabel">Titular de la Cuenta *</label><input type="text" class="finput-white" id="cc-titular" placeholder="Nombre completo" value="${_session.nombre_completo||''}"></div>
+          </div>
+          <button class="fbtn" onclick="generarCuentaCobro()">🧾 Generar Cuenta de Cobro</button>
+          <div class="fstatus" id="cc-status"></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <div style="font-size:.9rem;font-weight:500;margin-bottom:1rem">Mis Cuentas de Cobro</div>
+          ${misCC.length?misCC.map(cc=>`
+            <div style="padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.06)">
+              <div style="font-size:.82rem;font-weight:500">#${cc.numero}</div>
+              <div style="font-size:.72rem;color:var(--gray)">${cc.fecha} · $${Number(cc.valor).toLocaleString('es-CO')}</div>
+              <button class="fbtn-outline" style="margin-top:.4rem;font-size:.65rem;padding:.35rem .7rem" onclick='descargarCuentaCobroPDF(${JSON.stringify(cc).replace(/'/g,"&apos;")})'>⬇ Descargar PDF</button>
+            </div>`).join(''):`<div class="empty"><div class="empty-icon">🧾</div>Aún no has generado ninguna.</div>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+function nextCCNumero(){
+  return 'CC-'+Date.now().toString().slice(-8);
+}
+
+async function generarCuentaCobro(){
+  const cedula=document.getElementById('cc-cedula').value.trim();
+  const concepto=document.getElementById('cc-concepto').value.trim();
+  const valor=document.getElementById('cc-valor').value;
+  const fecha=document.getElementById('cc-fecha').value;
+  const banco=document.getElementById('cc-banco').value.trim();
+  const tipoCuenta=document.getElementById('cc-tipocuenta').value;
+  const numCuenta=document.getElementById('cc-numcuenta').value.trim();
+  const titular=document.getElementById('cc-titular').value.trim();
+  const campanaId=document.getElementById('cc-campana').value;
+  const status=document.getElementById('cc-status');
+
+  if(!cedula||!concepto||!valor||!fecha||!banco||!numCuenta||!titular){
+    status.className='fstatus err';status.textContent='Completa todos los campos obligatorios.';return;
+  }
+  status.className='fstatus info';status.textContent='Generando...';
+
+  const numero=nextCCNumero();
+  const cc={
+    id:'cc_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    modelo_id:_session.id, campana_id:campanaId||null,
+    numero, cedula, concepto, valor, fecha,
+    banco, tipo_cuenta:tipoCuenta, numero_cuenta:numCuenta, titular,
+    status:'generada', created_at:Date.now()
+  };
+  const ok=await sbI('cuentas_cobro',cc);
+  if(ok){
+    status.className='fstatus ok';status.textContent='✓ Cuenta de cobro generada.';
+    descargarCuentaCobroPDF(cc);
+    setTimeout(()=>renderCuentaCobro(),1200);
+  } else {
+    status.className='fstatus err';status.textContent='Error al generar. Intenta de nuevo.';
+  }
+}
+
+function descargarCuentaCobroPDF(cc){
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'letter'});
+  const nombreModelo=(_session.nombre_completo||_session.nombre_artistico||'');
+  const valorFmt='$ '+Number(cc.valor).toLocaleString('es-CO');
+  const fechaFmt=new Date(cc.fecha+'T00:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+
+  doc.setFont('helvetica','bold');doc.setFontSize(18);
+  doc.text('CUENTA DE COBRO',105,25,{align:'center'});
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text('No. '+cc.numero,105,32,{align:'center'});
+
+  doc.setDrawColor(200,165,90);doc.setLineWidth(0.8);
+  doc.line(20,38,195,38);
+
+  doc.setFontSize(11);
+  doc.text('Medellín, '+fechaFmt,20,48);
+  doc.setFont('helvetica','bold');doc.text('Debe a: ',20,60);
+  doc.setFont('helvetica','normal');doc.text(nombreModelo,45,60);
+  doc.setFont('helvetica','bold');doc.text('C.C. No.: ',20,67);
+  doc.setFont('helvetica','normal');doc.text(cc.cedula,45,67);
+
+  doc.setFont('helvetica','bold');doc.text('La suma de: ',20,80);
+  doc.setFont('helvetica','bold');doc.setTextColor(160,120,32);doc.setFontSize(14);
+  doc.text(valorFmt,20,90);
+  doc.setTextColor(0,0,0);doc.setFontSize(11);doc.setFont('helvetica','normal');
+
+  doc.setFont('helvetica','bold');doc.text('Por concepto de: ',20,102);
+  doc.setFont('helvetica','normal');
+  const conceptLines=doc.splitTextToSize(cc.concepto,155);
+  doc.text(conceptLines,20,110);
+
+  let y=110+conceptLines.length*6+12;
+  doc.line(20,y,195,y);
+  y+=10;
+  doc.setFont('helvetica','bold');doc.text('Datos para el pago',20,y);
+  y+=8;
+  doc.setFont('helvetica','normal');
+  doc.text('Banco: '+cc.banco,20,y);y+=6;
+  doc.text('Tipo de cuenta: '+cc.tipo_cuenta,20,y);y+=6;
+  doc.text('N° de cuenta: '+cc.numero_cuenta,20,y);y+=6;
+  doc.text('Titular: '+cc.titular,20,y);y+=6;
+  doc.text('C.C. titular: '+cc.cedula,20,y);
+
+  y+=25;
+  doc.line(20,y,80,y);
+  y+=6;
+  doc.text('Firma: '+nombreModelo,20,y);
+
+  doc.setFontSize(8);doc.setTextColor(150,150,150);
+  doc.text('Generado a través de AG Elite Models · agelitemodel.com',105,285,{align:'center'});
+
+  doc.save('Cuenta_Cobro_'+cc.numero+'.pdf');
+}
+
+/* ============ ADMIN — MODELOS ============ */
+let _admModels=[];
+async function renderAdmModelos(status){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const rows=await sbQ('models');
+  _admModels=rows;
+  const filtered=rows.filter(m=>m.status===status).sort((a,b)=>(b.submitted_at||0)-(a.submitted_at||0));
+  const labels={pendiente:'Pendientes',aprobada:'Aprobadas',rechazada:'Rechazadas','pendiente-fotos':'Esperando Fotos'};
+  if(!filtered.length){
+    el.innerHTML=`<div style="margin-bottom:1.5rem;font-size:.9rem;font-weight:500">${labels[status]}</div><div class="empty" style="padding:4rem"><div class="empty-icon">✦</div>No hay modelos en este estado.</div>`;
+    return;
+  }
+  el.innerHTML=`<div style="margin-bottom:1.5rem;font-size:.9rem;font-weight:500">${labels[status]} (${filtered.length})</div>` +
+    filtered.map(m=>`
+    <div class="panel" style="margin-bottom:.9rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap" data-mid="${m.id}">
+      <div class="model-foto" style="width:56px;height:56px">${m.fotos&&m.fotos[0]?`<img src="${m.fotos[0]}" style="object-position:center ${mFotoPos(m.fotos_pos,0)}%">`:''}</div>
+      <div style="flex:1;min-width:180px">
+        <div style="font-weight:600">${m.destacada?'<span style="color:var(--gold)">★ </span>':''}${m.nombre_artistico||'(sin nombre)'} <span style="color:var(--gray);font-weight:300;font-size:.8rem">${m.nombre_completo||''}</span></div>
+        <div style="font-size:.72rem;color:var(--gray)">${m.edad?m.edad+' años':''} ${m.ciudad?'· '+m.ciudad:''} ${m.estatura?'· '+m.estatura+'cm':''}</div>
+        <div style="font-size:.65rem;color:var(--gold)">${(m.categorias||[]).join(' · ')}${m.nivel?' · '+m.nivel:''}</div>
+      </div>
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">
+        <button class="fbtn-outline" style="font-size:.68rem;padding:.4rem .8rem" onclick="admVerModelo('${m.id}')">Ver</button>
+        ${m.whatsapp?`<a href="https://wa.me/${m.whatsapp.replace(/[^0-9]/g,'')}" target="_blank" style="background:var(--green);color:#fff;padding:.4rem .8rem;font-size:.68rem;text-decoration:none;font-family:var(--ff)">💬 WA</a>`:''}
+        ${status!=='aprobada'?`
+          <select id="nivel-${m.id}" style="background:var(--bg);color:#fff;border:1px solid var(--border);padding:.38rem .6rem;font-size:.68rem">
+            <option value="Élite">⭐ Élite</option><option value="Estándar" selected>Estándar</option>
+          </select>
+          <button style="background:var(--green);color:#fff;border:none;padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admAceptar('${m.id}')">✓ Aceptar</button>`:''}
+        ${status==='aprobada'?`
+          <select onchange="admUpdateNivel('${m.id}',this.value)" style="background:var(--bg);color:#fff;border:1px solid var(--border);padding:.38rem .6rem;font-size:.68rem">
+            <option value="Élite"${m.nivel==='Élite'?' selected':''}>⭐ Élite</option><option value="Estándar"${m.nivel!=='Élite'?' selected':''}>Estándar</option>
+          </select>
+          <button style="background:${m.destacada?'#5a3a00':'var(--gold-d)'};color:${m.destacada?'var(--gold)':'#0a0a0a'};border:none;padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admToggleStar('${m.id}')">${m.destacada?'★ Portada':'☆ Destacar'}</button>`:''}
+        ${status!=='pendiente-fotos'&&status!=='rechazada'?`<button class="pbtn-red" style="border:1px solid #e67e22;color:#e67e22;background:none;padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admPedirFotos('${m.id}')">📸</button>`:''}
+        ${status!=='pendiente'?`<button class="fbtn-outline" style="font-size:.68rem;padding:.4rem .7rem" onclick="admSetStatus('${m.id}','pendiente')">↩</button>`:''}
+        ${status!=='rechazada'?`<button class="pbtn-red" style="background:none;border:1px solid var(--red);color:var(--red);padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admSetStatus('${m.id}','rechazada')">Rechazar</button>`:''}
+        <button class="pbtn-red" style="background:none;border:1px solid var(--red);color:var(--red);padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admEliminar('${m.id}','${(m.nombre_artistico||'').replace(/'/g,'')}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function admAceptar(id){
+  const sel=document.getElementById('nivel-'+id);
+  const nivel=sel?sel.value:'Estándar';
+  await sbU('models','id=eq.'+encodeURIComponent(id),{status:'aprobada',approved_at:Date.now(),nivel});
+  navTo(_tab);
+}
+async function admSetStatus(id,status){
+  await sbU('models','id=eq.'+encodeURIComponent(id),{status});
+  navTo(_tab);
+}
+async function admUpdateNivel(id,nivel){
+  await sbU('models','id=eq.'+encodeURIComponent(id),{nivel});
+}
+async function admToggleStar(id){
+  const m=_admModels.find(x=>x.id===id);
+  if(!m) return;
+  await sbU('models','id=eq.'+encodeURIComponent(id),{destacada:!m.destacada});
+  navTo(_tab);
+}
+async function admEliminar(id,nombre){
+  if(!confirm(`¿Eliminar a "${nombre}" permanentemente?`)) return;
+  try{await fetch(`${SB}/rest/v1/models?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:SH});}catch(e){}
+  navTo(_tab);
+}
+async function admPedirFotos(id){
+  const m=_admModels.find(x=>x.id===id);
+  if(!m) return;
+  const wa=(m.whatsapp||'').replace(/[^0-9]/g,'');
+  if(!wa){alert('Esta modelo no tiene WhatsApp registrado.');return;}
+  const nombre=m.nombre_artistico||m.nombre_completo||'modelo';
+  const msg=`Hola ${nombre}! 😊\n\nEsperamos que te encuentres muy bien.\n\nSomos AG Elite Models. Queremos agradecerte por realizar tu registro en nuestra agencia. Hemos revisado tu perfil y realmente nos ha gustado tu imagen y el potencial que tienes para formar parte de nuestro catálogo oficial de modelos.\n\nDurante la revisión de tu registro, identificamos que sería ideal actualizar tu portafolio con fotografías profesionales de mayor calidad, ya que esto permitirá que tu perfil tenga una mejor presentación y mayor impacto frente a artistas, marcas, productoras y empresas que buscan talento a través de nuestra agencia.\n\nPor ello, en AG Elite Models ofrecemos la realización de un book fotográfico profesional, con un valor de $600.000 COP. Sin embargo, por ser una nueva integrante de nuestra agencia, recibirás un 50% de descuento, por lo que el valor final será de $300.000 COP.\n\nLas fotografías serán de tu propiedad, por lo que también podrás utilizarlas para tu portafolio personal, redes sociales, castings y futuros proyectos.\n\nSi estás interesada, por favor indícanos para proceder con la programación de tu sesión fotográfica. Será un gusto acompañarte en este nuevo paso de tu carrera como modelo.\n\n¡Quedamos atentos a tu respuesta! ✨`;
+  await sbU('models','id=eq.'+encodeURIComponent(id),{status:'pendiente-fotos'});
+  window.open('https://wa.me/'+wa+'?text='+encodeURIComponent(msg),'_blank');
+  navTo(_tab);
+}
+
+/* ============ ADMIN — VER/EDITAR MODELO + REENCUADRE DE FOTOS ============ */
+function mFotoPos(posArr,i){ // devuelve el % vertical guardado para la foto i (0-100), default 0 (arriba)
+  const v=posArr&&posArr[i];
+  return (v===undefined||v===null||v==='')?0:Number(v);
+}
+let _editState=null; // {id, fotos:[...], fotosPos:[...]}
+
+function admVerModelo(id){
+  const m=_admModels.find(x=>x.id===id);
+  if(!m) return;
+  _editState={id, fotos:[...(m.fotos||[])], fotosPos:[...(m.fotos_pos||[])]};
+  const overlay=document.createElement('div');
+  overlay.id='adm-edit-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:5500;background:rgba(0,0,0,.92);overflow-y:auto;padding:2rem';
+  overlay.innerHTML=`
+    <div style="max-width:880px;margin:0 auto;background:#111;border:1px solid var(--border);padding:2rem;color:#fff;position:relative">
+      <button onclick="_editState=null;this.closest('#adm-edit-overlay').remove()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer">✕</button>
+      <div style="font-size:1.2rem;font-weight:600;margin-bottom:1.2rem">Editar Modelo</div>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2);margin-bottom:.6rem">Fotos — ajusta el encuadre con la barra</div>
+      <div id="adm-fotos-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem"></div>
+      <input type="file" id="adm-add-foto-input" accept="image/*" style="display:none" onchange="admAddFotoFile(event)">
+      <button id="adm-add-foto-btn" onclick="document.getElementById('adm-add-foto-input').click()" style="background:none;border:1px dashed var(--border);color:var(--gray);padding:.5rem 1rem;font-size:.7rem;cursor:pointer;font-family:var(--ff);margin-bottom:1.5rem">+ Agregar foto</button>
+
+      <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2);margin-bottom:.8rem">Información</div>
+      <div class="fgrid2" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">Nombre Artístico</label><input class="finput-white" id="em-artistico" value="${(m.nombre_artistico||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Nombre Completo</label><input class="finput-white" id="em-completo" value="${(m.nombre_completo||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgrid3" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">Edad</label><input type="number" class="finput-white" id="em-edad" value="${m.edad||''}"></div>
+        <div class="fgroup"><label class="flabel">Ciudad</label><input class="finput-white" id="em-ciudad" value="${(m.ciudad||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Nacionalidad</label><input class="finput-white" id="em-nacion" value="${(m.nacionalidad||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">WhatsApp</label><input class="finput-white" id="em-wa" value="${(m.whatsapp||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Email</label><input class="finput-white" id="em-email" value="${(m.email||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgrid2" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">Instagram</label><input class="finput-white" id="em-ig" value="${(m.instagram||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">TikTok</label><input class="finput-white" id="em-tt" value="${(m.tiktok||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgrid3" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">Estatura</label><input class="finput-white" id="em-estatura" value="${(m.estatura||'').toString().replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Medidas</label><input class="finput-white" id="em-medidas" value="${(m.medidas||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Talla Ropa</label><input class="finput-white" id="em-talla" value="${(m.talla_ropa||'').toString().replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgrid3" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">Talla Calzado</label><input class="finput-white" id="em-calzado" value="${(m.talla_calzado||'').toString().replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Cabello</label><input class="finput-white" id="em-cabello" value="${(m.cabello||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Ojos</label><input class="finput-white" id="em-ojos" value="${(m.ojos||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:.8rem"><label class="flabel">Tatuajes</label><input class="finput-white" id="em-tatuajes" value="${(m.tatuajes||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fgroup" style="margin-bottom:.8rem"><label class="flabel">Categorías (separadas por coma)</label><input class="finput-white" id="em-categorias" value="${(m.categorias||[]).join(', ')}"></div>
+      <div class="fgrid2" style="margin-bottom:.8rem">
+        <div class="fgroup"><label class="flabel">Marcas con las que ha trabajado</label><input class="finput-white" id="em-marcas" value="${(m.marcas||'').replace(/"/g,'&quot;')}"></div>
+        <div class="fgroup"><label class="flabel">Videoclips</label><input class="finput-white" id="em-videos" value="${(m.videoclips||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:.8rem"><label class="flabel">Video de presentación (link)</label><input class="finput-white" id="em-videopres" value="${(m.video_presentacion||'').replace(/"/g,'&quot;')}"></div>
+      <div class="fgroup" style="margin-bottom:1rem"><label class="flabel">Experiencia</label><textarea class="finput-white" id="em-exp" style="min-height:80px;resize:vertical">${m.experiencia||''}</textarea></div>
+      <div style="display:flex;gap:1.5rem;margin-bottom:1.5rem;font-size:.78rem">
+        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="em-viajar" ${m.disponible_viajar?'checked':''}> Disponible para viajar</label>
+        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="em-pasaporte" ${m.pasaporte?'checked':''}> Pasaporte vigente</label>
+        <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer"><input type="checkbox" id="em-internacional" ${m.internacional?'checked':''}> Proyectos internacionales</label>
+      </div>
+
+      <button onclick="admGuardarModelo()" style="background:var(--gold);color:var(--bg);border:none;padding:.6rem 1.4rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Guardar Cambios</button>
+      <span class="fstatus" id="em-status" style="display:inline-block;margin-left:.8rem"></span>
+    </div>`;
+  document.body.appendChild(overlay);
+  admPintarFotosGrid();
+}
+
+function admPintarFotosGrid(){
+  const grid=document.getElementById('adm-fotos-grid');
+  if(!grid||!_editState) return;
+  grid.innerHTML=_editState.fotos.map((f,i)=>{
+    const pos=mFotoPos(_editState.fotosPos,i);
+    return `
+    <div style="border:1px solid var(--border);padding:.5rem">
+      <div style="aspect-ratio:3/4;overflow:hidden;background:var(--bg3);margin-bottom:.5rem">
+        <img id="adm-foto-img-${i}" src="${f}" style="width:100%;height:100%;object-fit:cover;object-position:center ${pos}%">
+      </div>
+      <input type="range" min="0" max="100" value="${pos}" oninput="admAjustarEncuadre(${i},this.value)" style="width:100%;margin-bottom:.4rem">
+      <div style="display:flex;gap:.3rem">
+        <input type="file" accept="image/*" id="adm-replace-input-${i}" style="display:none" onchange="admReemplazarFoto(${i},event)">
+        <button onclick="document.getElementById('adm-replace-input-${i}').click()" style="flex:1;background:none;border:1px solid var(--border);color:var(--gray);padding:.3rem;font-size:.62rem;cursor:pointer;font-family:var(--ff)">Cambiar</button>
+        <button onclick="admQuitarFoto(${i})" style="background:none;border:1px solid var(--red);color:var(--red);padding:.3rem .5rem;font-size:.62rem;cursor:pointer;font-family:var(--ff)">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('adm-add-foto-btn').style.display=_editState.fotos.length>=4?'none':'inline-block';
+}
+function admAjustarEncuadre(i,val){
+  _editState.fotosPos[i]=Number(val);
+  const img=document.getElementById('adm-foto-img-'+i);
+  if(img) img.style.objectPosition='center '+val+'%';
+}
+async function admReemplazarFoto(i,e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>8*1024*1024){alert('La imagen es muy pesada (máx 8MB)');return;}
+  const compressed=await pCompressImage(file);
+  _editState.fotos[i]=compressed;
+  _editState.fotosPos[i]=0;
+  admPintarFotosGrid();
+}
+function admQuitarFoto(i){
+  _editState.fotos.splice(i,1);
+  _editState.fotosPos.splice(i,1);
+  admPintarFotosGrid();
+}
+async function admAddFotoFile(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(_editState.fotos.length>=4){alert('Máximo 4 fotos.');return;}
+  if(file.size>8*1024*1024){alert('La imagen es muy pesada (máx 8MB)');return;}
+  const compressed=await pCompressImage(file);
+  _editState.fotos.push(compressed);
+  _editState.fotosPos.push(0);
+  admPintarFotosGrid();
+  e.target.value='';
+}
+async function admGuardarModelo(){
+  const st=document.getElementById('em-status');
+  st.className='fstatus info';st.textContent='Guardando...';
+  const v=id=>document.getElementById(id)?.value||'';
+  const categorias=v('em-categorias').split(',').map(s=>s.trim()).filter(Boolean);
+  const data={
+    nombre_artistico:v('em-artistico'),nombre_completo:v('em-completo'),
+    edad:v('em-edad'),ciudad:v('em-ciudad'),nacionalidad:v('em-nacion'),
+    whatsapp:v('em-wa'),email:v('em-email'),instagram:v('em-ig'),tiktok:v('em-tt'),
+    estatura:v('em-estatura'),medidas:v('em-medidas'),talla_ropa:v('em-talla'),talla_calzado:v('em-calzado'),
+    cabello:v('em-cabello'),ojos:v('em-ojos'),tatuajes:v('em-tatuajes'),categorias,
+    marcas:v('em-marcas'),videoclips:v('em-videos'),video_presentacion:v('em-videopres'),experiencia:v('em-exp'),
+    disponible_viajar:document.getElementById('em-viajar').checked,
+    pasaporte:document.getElementById('em-pasaporte').checked,
+    internacional:document.getElementById('em-internacional').checked,
+    fotos:_editState.fotos, fotos_pos:_editState.fotosPos
+  };
+  const ok=await sbU('models','id=eq.'+encodeURIComponent(_editState.id),data);
+  if(ok){
+    st.className='fstatus ok';st.textContent='✓ Guardado';
+    const idx=_admModels.findIndex(x=>x.id===_editState.id);
+    if(idx>-1) _admModels[idx]={..._admModels[idx],...data};
+    setTimeout(()=>{document.getElementById('adm-edit-overlay')?.remove();_editState=null;navTo(_tab);},900);
+  } else {
+    st.className='fstatus err';st.textContent='Error al guardar.';
+  }
+}
+
+/* ============ ADMIN — ORDEN PORTADA ============ */
+async function renderAdmOrden(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const rows=await sbQ('models');
+  const featured=rows.filter(m=>m.status==='aprobada'&&m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
+  if(!featured.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden Portada</div><div class="empty" style="padding:4rem"><div class="empty-icon">⬍</div>No hay modelos destacadas. Márcalas con ★ en Aprobadas.</div>`;return;}
+  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden Portada</div><p style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">Arrastra para cambiar el orden en que aparecen en la portada.</p>
+    <div id="orden-list">${featured.map((m,i)=>`
+      <div class="panel orden-card" draggable="true" data-id="${m.id}" style="display:flex;align-items:center;gap:1rem;margin-bottom:.6rem;cursor:grab">
+        <span style="color:var(--gray2)">⠿</span>
+        <div class="model-foto">${m.fotos&&m.fotos[0]?`<img src="${m.fotos[0]}" style="object-position:center ${mFotoPos(m.fotos_pos,0)}%">`:''}</div>
+        <div style="flex:1;font-weight:500">${m.nombre_artistico||''}</div>
+        <div style="font-size:1.6rem;color:var(--gray2);font-weight:700">${String(i+1).padStart(2,'0')}</div>
+      </div>`).join('')}</div>`;
+  let srcId=null;
+  document.querySelectorAll('.orden-card').forEach(card=>{
+    card.addEventListener('dragstart',()=>{srcId=card.dataset.id;setTimeout(()=>card.style.opacity='.4',0);});
+    card.addEventListener('dragend',()=>card.style.opacity='1');
+    card.addEventListener('dragover',e=>{e.preventDefault();card.style.borderColor='var(--gold)';});
+    card.addEventListener('dragleave',()=>card.style.borderColor='var(--border)');
+    card.addEventListener('drop',async e=>{
+      e.preventDefault();card.style.borderColor='var(--border)';
+      const list=rows.filter(m=>m.status==='aprobada'&&m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
+      const si=list.findIndex(m=>m.id===srcId);
+      const di=list.findIndex(m=>m.id===card.dataset.id);
+      if(si<0||di<0) return;
+      const [mv]=list.splice(si,1);list.splice(di,0,mv);
+      await Promise.all(list.map((m,i)=>sbU('models','id=eq.'+encodeURIComponent(m.id),{orden:i})));
+      renderAdmOrden();
+    });
+  });
+}
+
+/* ============ ADMIN — CAMPAÑAS ============ */
+async function renderAdmCampanas(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const camps=await sbQ('campanas','plataforma=eq.ag_elite_models&order=created_at.desc');
+  if(!camps.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Campañas</div><div class="empty" style="padding:4rem"><div class="empty-icon">🎯</div>No hay campañas aún.</div>`;return;}
+  const clienteIds=[...new Set(camps.map(c=>c.cliente_id).filter(Boolean))];
+  const clientes=clienteIds.length?await sbQ('clientes','id=in.('+clienteIds.map(i=>`"${i}"`).join(',')+')'):[];
+  const cm=Object.fromEntries(clientes.map(cl=>[cl.id,cl]));
+  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Campañas (${camps.length})</div>` +
+    camps.map(c=>{
+      const cl=cm[c.cliente_id]||{};
+      return `
+    <div class="panel" style="margin-bottom:.9rem;cursor:pointer" onclick="admVerCampana('${c.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:1rem;margin-bottom:.6rem">
+        <div>
+          <div style="font-weight:600">${c.titulo}</div>
+          <div style="font-size:.72rem;color:var(--gray)">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
+          <div style="font-size:.68rem;color:var(--gold);margin-top:.2rem">Cliente: ${cl.nombre||cl.empresa||c.cliente_id}</div>
+        </div>
+        <div style="display:flex;gap:.4rem;align-items:start" onclick="event.stopPropagation()">
+        ${c.status==='pendiente'?`
+            <button style="background:var(--green);color:#fff;border:none;padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admAprobarCampana('${c.id}')">✓ Aprobar</button>
+            <button class="pbtn-red" style="background:none;border:1px solid var(--red);color:var(--red);padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admRechazarCampana('${c.id}')">✗</button>`:
+            `<span class="badge ${c.status}">${c.status==='aprobada'?'✓ Aprobada':'✗ Rechazada'}</span>`}
+          <button style="background:none;border:1px solid var(--border);color:var(--gray);padding:.4rem .8rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)" onclick="admVerCampana('${c.id}')">Ver Detalle →</button>
+        </div>
+      </div>
+      ${c.perfil_buscado?`<div style="font-size:.78rem;color:var(--gray)"><b style="color:rgba(255,255,255,.6)">Perfil:</b> ${c.perfil_buscado}</div>`:''}
+      ${c.valor_total?`<div style="font-size:.78rem;color:var(--gold);margin-top:.2rem">💰 ${fmtCOP(c.valor_total)}${c.comision_porcentaje?' · Comisión '+c.comision_porcentaje+'% · Neto modelo '+fmtCOP(montoNeto(c)):' · Sin comisión asignada aún'}</div>`:''}
+      ${c.descripcion?`<p style="font-size:.78rem;color:var(--gray);margin-top:.4rem;line-height:1.6">${c.descripcion}</p>`:''}
+    </div>`;}).join('');
+}
+async function admAprobarCampana(id){await sbU('campanas','id=eq.'+encodeURIComponent(id),{status:'aprobada'});renderAdmCampanas();}
+async function admRechazarCampana(id){await sbU('campanas','id=eq.'+encodeURIComponent(id),{status:'rechazada'});renderAdmCampanas();}
+
+/* ============ ADMIN — DETALLE DE CAMPAÑA + COMISIÓN ============ */
+async function admVerCampana(id){
+  const camps=await sbQ('campanas','id=eq.'+encodeURIComponent(id));
+  const c=camps[0]; if(!c) return;
+  const clientesR=c.cliente_id?await sbQ('clientes','id=eq.'+encodeURIComponent(c.cliente_id)):[];
+  const cl=clientesR[0]||{};
+  const posts=await sbQ('postulaciones','campana_id=eq.'+encodeURIComponent(id));
+  const modelIds=[...new Set(posts.map(p=>p.modelo_id))];
+  const models=modelIds.length?await sbQ('models','id=in.('+modelIds.map(i=>`"${i}"`).join(',')+')'):[];
+  const mm=Object.fromEntries(models.map(m=>[m.id,m]));
+  const total=parseFloat(c.valor_total)||0;
+  const comActual=parseFloat(c.comision_porcentaje)||0;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;z-index:5500;background:rgba(0,0,0,.92);overflow-y:auto;padding:2rem';
+  overlay.innerHTML=`
+    <div style="max-width:760px;margin:0 auto;background:#111;border:1px solid var(--border);padding:2rem;color:#fff;position:relative">
+      <button onclick="this.closest('[style*=z-index]').remove()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--gray);font-size:1.2rem;cursor:pointer">✕</button>
+      <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:.3rem">
+        <div style="font-size:1.3rem;font-weight:600">${c.titulo}</div>
+        <span class="badge ${c.status}">${c.status==='pendiente'?'⏳ Pendiente':c.status==='aprobada'?'✓ Aprobada':'✗ Rechazada'}</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">${c.tipo}${c.fecha?' · '+c.fecha:''}${c.ciudad?' · '+c.ciudad:''}${c.horario?' · '+c.horario:''}${c.num_modelos?' · '+c.num_modelos+' modelo(s)':''}</div>
+      <div style="font-size:.75rem;color:var(--gold);margin-bottom:1.2rem">Cliente: ${cl.nombre||cl.empresa||'—'}${cl.whatsapp?' · '+cl.whatsapp:''}${cl.email?' · '+cl.email:''}</div>
+      ${c.perfil_buscado?`<div style="font-size:.8rem;margin-bottom:.6rem"><b style="color:rgba(255,255,255,.6)">Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
+      ${c.descripcion?`<p style="font-size:.82rem;color:var(--gray);line-height:1.7;margin-bottom:1rem">${c.descripcion}</p>`:''}
+      <div style="display:flex;gap:1.5rem;margin-bottom:1.2rem;font-size:.78rem;color:var(--gray2)">
+        ${c.transporte?'✈ Transporte':''}${c.alimentacion?' 🍽 Alimentación':''}${c.vestuario?' 👗 Vestuario':''}
+      </div>
+
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);padding:1.2rem;margin-bottom:1.2rem">
+        <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2);margin-bottom:.8rem">Pago y comisión de agencia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;align-items:end;margin-bottom:1rem">
+          <div>
+            <div style="font-size:.62rem;color:var(--gray)">Valor total (cliente paga)</div>
+            <div style="font-size:1.05rem;font-weight:600">${fmtCOP(total)}</div>
+          </div>
+          <div class="fgroup" style="margin:0">
+            <label class="flabel">% Comisión agencia</label>
+            <input type="number" id="adm-com-${c.id}" class="finput-white" value="${comActual}" min="0" max="100" oninput="admRecalcNeto('${c.id}',${total})">
+          </div>
+          <div>
+            <div style="font-size:.62rem;color:var(--gray)">Neto para la modelo</div>
+            <div style="font-size:1.05rem;font-weight:600;color:var(--gold)" id="adm-neto-${c.id}">${fmtCOP(total*(1-comActual/100))}</div>
+          </div>
+        </div>
+        <button onclick="admGuardarComision('${c.id}')" style="background:var(--gold);color:var(--bg);border:none;padding:.5rem 1.2rem;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Guardar Comisión</button>
+        <span class="fstatus" id="adm-com-st-${c.id}" style="display:inline-block;margin-left:.8rem"></span>
+        <div style="font-size:.65rem;color:var(--gray2);margin-top:.6rem">La modelo solo verá el valor neto. Nunca ve el total ni el % de comisión.</div>
+      </div>
+
+      ${c.status==='pendiente'?`
+      <div style="display:flex;gap:.6rem;margin-bottom:1.5rem">
+        <button style="background:var(--green);color:#fff;border:none;padding:.5rem 1.1rem;font-size:.72rem;cursor:pointer;font-family:var(--ff)" onclick="admAprobarCampana('${c.id}');this.closest('[style*=z-index]').remove()">✓ Aprobar Campaña</button>
+        <button style="background:none;border:1px solid var(--red);color:var(--red);padding:.5rem 1.1rem;font-size:.72rem;cursor:pointer;font-family:var(--ff)" onclick="admRechazarCampana('${c.id}');this.closest('[style*=z-index]').remove()">✗ Rechazar</button>
+      </div>`:''}
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem">
+        <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2);margin-bottom:.8rem">Postulaciones (${posts.length})</div>
+        ${posts.length===0?'<div style="font-size:.8rem;color:var(--gray2)">Aún no hay postulaciones para esta campaña.</div>':
+          posts.map(p=>{
+            const m=mm[p.modelo_id]||{};
+            return `<div style="display:flex;align-items:center;gap:1rem;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.04);flex-wrap:wrap">
+              ${m.fotos&&m.fotos[0]?`<div class="model-foto"><img src="${m.fotos[0]}" style="object-position:center ${mFotoPos(m.fotos_pos,0)}%"></div>`:'<div style="width:38px;height:38px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem">'+(m.nombre_artistico||'?')[0]+'</div>'}
+              <div style="flex:1;min-width:120px">
+                <div style="font-size:.82rem;font-weight:500">${m.nombre_artistico||m.nombre_completo||'Modelo'}</div>
+                <div style="font-size:.7rem;color:var(--gray)">${m.ciudad||''}${p.mensaje?' · "'+p.mensaje.slice(0,60)+(p.mensaje.length>60?'...':'')+'"':''}</div>
+              </div>
+              <span class="badge ${p.status}">${p.status==='pendiente'?'⏳':p.status==='aprobada'?'✓ Seleccionada':'✗ No seleccionada'}</span>
+            </div>`;
+          }).join('')}
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:1.2rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;flex-wrap:wrap;gap:.6rem">
+          <div style="font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2)">✨ Sugerencias de la IA</div>
+          <button onclick="admSugerirModelos('${c.id}')" style="background:none;border:1px solid var(--gold);color:var(--gold);padding:.4rem .9rem;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--ff)">${(c.sugerencias_ia&&c.sugerencias_ia.length)?'↻ Regenerar':'Sugerir modelos con IA'}</button>
+        </div>
+        <div id="ia-sug-${c.id}">${admPintarSugerencias(c.sugerencias_ia,c.titulo)}</div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+function admPintarSugerencias(sugerencias,tituloCampana){
+  if(!sugerencias||!sugerencias.length) return '<div style="font-size:.78rem;color:var(--gray2)">Aún no se han generado sugerencias para esta campaña.</div>';
+  const msg=encodeURIComponent(`Hola! Te escribo de AG Elite Models — tenemos una campaña ("${tituloCampana}") que creemos que calza muy bien contigo. ¿Te interesaría?`);
+  return sugerencias.map(s=>`
+    <div style="display:flex;align-items:center;gap:1rem;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.04);flex-wrap:wrap">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;font-weight:600;color:var(--gold)">${s.score}</div>
+      <div style="flex:1;min-width:150px">
+        <div style="font-size:.82rem;font-weight:500">${s.nombre||s.id}${s.ciudad?' · '+s.ciudad:''}</div>
+        <div style="font-size:.72rem;color:var(--gray2);font-style:italic">${s.motivo||''}</div>
+      </div>
+      ${s.whatsapp?`<a href="https://wa.me/${(s.whatsapp||'').replace(/\D/g,'')}?text=${msg}" target="_blank" style="background:none;border:1px solid var(--border);color:var(--gray);padding:.4rem .8rem;font-size:.66rem;text-decoration:none;font-family:var(--ff)">📩 WhatsApp</a>`:''}
+    </div>`).join('');
+}
+async function admSugerirModelos(campId){
+  const box=document.getElementById('ia-sug-'+campId);
+  box.innerHTML='<div class="loader-wrap" style="padding:1rem 0"><div class="loader-spin"></div>La IA está revisando el catálogo...</div>';
+  try{
+    const res=await fetch('/.netlify/functions/match-models',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({campanaId:campId})
+    });
+    const data=await res.json();
+    if(!res.ok){box.innerHTML=`<div style="font-size:.78rem;color:var(--red)">${data.error||'Error generando sugerencias.'}</div>`;return;}
+    const camps=await sbQ('campanas','id=eq.'+encodeURIComponent(campId));
+    box.innerHTML=admPintarSugerencias(data.sugerencias,camps[0]?.titulo||'');
+  }catch(e){
+    box.innerHTML='<div style="font-size:.78rem;color:var(--red)">Error de conexión con la IA.</div>';
+  }
+}
+function admRecalcNeto(id,total){
+  const com=parseFloat(document.getElementById('adm-com-'+id).value)||0;
+  document.getElementById('adm-neto-'+id).textContent=fmtCOP(total*(1-com/100));
+}
+async function admGuardarComision(id){
+  const com=parseFloat(document.getElementById('adm-com-'+id).value)||0;
+  const st=document.getElementById('adm-com-st-'+id);
+  st.className='fstatus info';st.textContent='Guardando...';
+  const ok=await sbU('campanas','id=eq.'+encodeURIComponent(id),{comision_porcentaje:com});
+  if(ok){st.className='fstatus ok';st.textContent='✓ Guardado';}
+  else{st.className='fstatus err';st.textContent='Error al guardar';}
+}
+
+/* ============ PAGO — MERCADO PAGO (CLIENTE) ============ */
+async function iniciarPago(campId,btn){
+  if(btn){btn.disabled=true;btn.textContent='Generando pago...';}
+  try{
+    const res=await fetch('/.netlify/functions/create-payment',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({campanaId:campId,clienteId:_session.id})
+    });
+    const data=await res.json();
+    if(!res.ok||!data.init_point){
+      alert(data.error||'No se pudo generar el pago. Intenta de nuevo.');
+      if(btn){btn.disabled=false;btn.textContent='Pagar con Mercado Pago';}
+      return;
+    }
+    window.location.href=data.init_point;
+  }catch(e){
+    alert('Error de conexión al generar el pago.');
+    if(btn){btn.disabled=false;btn.textContent='Pagar con Mercado Pago';}
+  }
+}
+function checkPagoReturn(){
+  const p=new URLSearchParams(window.location.search);
+  const pago=p.get('pago');
+  if(!pago) return;
+  window.history.replaceState({},'',window.location.pathname);
+  setTimeout(()=>{
+    if(pago==='success') alert('✓ Pago procesado. Puede tardar unos segundos en reflejarse como confirmado.');
+    else if(pago==='pending') alert('Tu pago está pendiente de confirmación.');
+    else if(pago==='failure') alert('El pago no se completó. Puedes intentarlo de nuevo desde Mis Campañas.');
+  },300);
+}
+
+/* ============ ADMIN — CUENTAS DE COBRO ============ */
+async function renderAdmCuentas(){
+  const el=document.getElementById('main-content');
+  el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
+  const ccs=await sbQ('cuentas_cobro','order=created_at.desc');
+  if(!ccs.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Cuentas de Cobro</div><div class="empty" style="padding:4rem"><div class="empty-icon">🧾</div>No hay cuentas de cobro generadas aún.</div>`;return;}
+  const modelIds=[...new Set(ccs.map(c=>c.modelo_id))];
+  const models=modelIds.length?await sbQ('models','id=in.('+modelIds.map(i=>`"${i}"`).join(',')+')'):[]; 
+  const mm=Object.fromEntries(models.map(m=>[m.id,m]));
+  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Cuentas de Cobro (${ccs.length})</div>` +
+    ccs.map(cc=>{
+      const m=mm[cc.modelo_id]||{};
+      return `<div class="panel" style="margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+        <div>
+          <div style="font-weight:600">#${cc.numero} — ${m.nombre_artistico||m.nombre_completo||'Modelo'}</div>
+          <div style="font-size:.72rem;color:var(--gray)">${cc.fecha} · $${Number(cc.valor).toLocaleString('es-CO')} · C.C. ${cc.cedula}</div>
+          <div style="font-size:.72rem;color:var(--gray);margin-top:.2rem">${(cc.concepto||'').slice(0,80)}${(cc.concepto||'').length>80?'...':''}</div>
+        </div>
+        <button style="background:var(--gold);color:var(--bg);border:none;padding:.5rem 1rem;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;font-weight:700;font-family:var(--ff)" onclick='admDescargarCC(${JSON.stringify(cc).replace(/'/g,"&apos;")},${JSON.stringify(m).replace(/'/g,"&apos;")})'>⬇ Descargar PDF</button>
+      </div>`;
+    }).join('');
+}
+
+function admDescargarCC(cc,m){
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'letter'});
+  const nombreModelo=(m.nombre_completo||m.nombre_artistico||cc.titular||'');
+  const valorFmt='$ '+Number(cc.valor).toLocaleString('es-CO');
+  const fechaFmt=new Date(cc.fecha+'T00:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+  doc.setFont('helvetica','bold');doc.setFontSize(18);
+  doc.text('CUENTA DE COBRO',105,25,{align:'center'});
+  doc.setFontSize(10);doc.setFont('helvetica','normal');
+  doc.text('No. '+cc.numero,105,32,{align:'center'});
+  doc.setDrawColor(200,165,90);doc.setLineWidth(0.8);
+  doc.line(20,38,195,38);
+  doc.setFontSize(11);
+  doc.text('Medellín, '+fechaFmt,20,48);
+  doc.setFont('helvetica','bold');doc.text('Debe a: ',20,60);
+  doc.setFont('helvetica','normal');doc.text(nombreModelo,45,60);
+  doc.setFont('helvetica','bold');doc.text('C.C. No.: ',20,67);
+  doc.setFont('helvetica','normal');doc.text(cc.cedula,45,67);
+  doc.setFont('helvetica','bold');doc.text('La suma de: ',20,80);
+  doc.setFont('helvetica','bold');doc.setTextColor(160,120,32);doc.setFontSize(14);
+  doc.text(valorFmt,20,90);
+  doc.setTextColor(0,0,0);doc.setFontSize(11);doc.setFont('helvetica','normal');
+  doc.setFont('helvetica','bold');doc.text('Por concepto de: ',20,102);
+  doc.setFont('helvetica','normal');
+  const conceptLines=doc.splitTextToSize(cc.concepto||'',155);
+  doc.text(conceptLines,20,110);
+  let y=110+conceptLines.length*6+12;
+  doc.line(20,y,195,y);
+  y+=10;
+  doc.setFont('helvetica','bold');doc.text('Datos para el pago',20,y);
+  y+=8;
+  doc.setFont('helvetica','normal');
+  doc.text('Banco: '+cc.banco,20,y);y+=6;
+  doc.text('Tipo de cuenta: '+cc.tipo_cuenta,20,y);y+=6;
+  doc.text('N° de cuenta: '+cc.numero_cuenta,20,y);y+=6;
+  doc.text('Titular: '+cc.titular,20,y);y+=6;
+  doc.text('C.C. titular: '+cc.cedula,20,y);
+  y+=25;
+  doc.line(20,y,80,y);
+  y+=6;
+  doc.text('Firma: '+nombreModelo,20,y);
+  doc.setFontSize(8);doc.setTextColor(150,150,150);
+  doc.text('Generado a través de AG Elite Models · agelitemodel.com',105,285,{align:'center'});
+  doc.save('Cuenta_Cobro_'+cc.numero+'.pdf');
+}
+
+/* ============ INIT ============ */
+window.addEventListener('DOMContentLoaded',async()=>{
+  checkPagoReturn();
+  const ml=await checkML();
+  if(ml) initApp();
+  else setPillTab('ingresar');
+});
+</script>
+</body>
+</html>
