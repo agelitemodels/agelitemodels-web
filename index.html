@@ -2965,7 +2965,7 @@ window.addEventListener('DOMContentLoaded', ()=>{ checkMagicLink(); });
     p.dataset.split='1';
     p.classList.add('ab-scroll-text');
     const text=p.textContent;
-    p.innerHTML=text.split('').map(ch=>`<span class="ch" style="opacity:.2">${ch===' '?'&nbsp;':ch}</span>`).join('');
+    p.innerHTML=text.split('').map(ch=>`<span class="ch" style="opacity:.2">${ch}</span>`).join('');
     abChars=Array.from(p.querySelectorAll('.ch'));
   }
   function updateCharReveal(){
