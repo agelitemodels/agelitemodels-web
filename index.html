@@ -182,7 +182,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
   <a href="#hero" class="n-logo">AG ELITE MODELS<em>Elite Talent Agency</em></a>
   <ul class="n-links">
     <li><a href="#gallery">Modelos</a></li>
-    <li><a href="catalogo.html" target="_blank">Catálogo</a></li>
+    <li><a href="catalogo.html">Catálogo</a></li>
     <li><a href="#campanas-activas">Campañas</a></li>
     <li><a href="/panel.html">Ser Modelo</a></li>
     <li><a href="#about">Nosotros</a></li>
@@ -203,7 +203,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 <div id="mob">
   <button class="mc" id="mc">✕</button>
   <a href="#gallery" class="mnl">Modelos</a>
-  <a href="catalogo.html" class="mnl" target="_blank">Catálogo</a>
+  <a href="catalogo.html" class="mnl">Catálogo</a>
   <a href="#campanas-activas" class="mnl">Campañas</a>
   <a href="/panel.html" class="mnl">Ser Modelo</a>
   <a href="#about" class="mnl">Nosotros</a>
@@ -309,10 +309,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 
 /* CAMPAÑAS ACTIVAS (público) */
 .camp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(0,0,0,.07)}
-.camp-card{background:var(--bg);padding:2.2rem;transition:all .32s;position:relative}
-.camp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .32s}
+.camp-card{background:var(--bg);padding:0;transition:all .32s;position:relative;display:flex;flex-direction:column;overflow:hidden}
+.camp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .32s;z-index:2}
 .camp-card:hover{background:var(--bg2)}
 .camp-card:hover::before{transform:scaleX(1)}
+.camp-cover{width:100%;height:170px;background-size:cover;background-position:center;position:relative;flex-shrink:0}
+.camp-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.45),transparent 65%)}
+.camp-tipo-over{position:absolute;top:1rem;left:1rem;z-index:1;color:#fff!important;background:rgba(0,0,0,.4)!important}
+.camp-body{padding:1.8rem 2.2rem 2.2rem}
 .camp-tipo{display:inline-block;font-size:7.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-d);background:rgba(200,165,90,.12);padding:.3rem .7rem;margin-bottom:1.1rem}
 .camp-title{font-family:var(--ff-h);font-size:1.5rem;letter-spacing:.03em;color:var(--black);margin-bottom:.5rem;line-height:1.15}
 .camp-meta{font-size:.74rem;color:var(--gray-soft);margin-bottom:1rem;display:flex;gap:.9rem;flex-wrap:wrap}
@@ -579,7 +583,7 @@ footer{background:var(--black);padding:5rem 5vw 2.5rem}
     </div>
     <div class="gal-grid gal-grid-3 rv" id="dynamic-models-grid"></div>
     <div style="text-align:center;margin-top:3.5rem" class="rv">
-      <a href="catalogo.html" target="_blank" class="btn btn-black" style="font-size:11px;padding:1.1rem 3rem">Ver Catálogo Completo →</a>
+      <a href="catalogo.html" class="btn btn-black" style="font-size:11px;padding:1.1rem 3rem">Ver Catálogo Completo →</a>
       <p style="font-size:.78rem;color:var(--gray);margin-top:1.2rem">¿Buscas un perfil específico? <a href="https://wa.me/573127444324?text=Hola%20AG%20Elite%20Models%2C%20busco%20un%20perfil%20especifico%20para%20mi%20proyecto" target="_blank" style="color:var(--black);text-decoration:underline">Cuéntanos por WhatsApp</a></p>
     </div>
   </div>
@@ -2011,7 +2015,7 @@ async function saveOrden(orderedList){
 
 async function loadCampanasActivas(){
   try{
-    const res=await fetch(`${SUPABASE_URL}/rest/v1/campanas?status=eq.aprobada&plataforma=eq.ag_elite_models&select=id,titulo,tipo,ciudad,fecha,horario,num_modelos,perfil_buscado,descripcion,created_at&order=created_at.desc`,{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/campanas?status=eq.aprobada&plataforma=eq.ag_elite_models&select=id,titulo,tipo,ciudad,fecha,horario,num_modelos,perfil_buscado,descripcion,portada,created_at&order=created_at.desc`,{
       headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}
     });
     const camps = res.ok ? await res.json() : [];
@@ -2023,15 +2027,18 @@ function paintCampanas(camps){
   if(!grid) return;
   grid.innerHTML = camps.length ? camps.map(c=>`
     <div class="camp-card">
-      <span class="camp-tipo">${c.tipo||'Proyecto'}</span>
-      <div class="camp-title">${c.titulo}</div>
-      <div class="camp-meta">
-        ${c.ciudad?`<span>📍 ${c.ciudad}</span>`:''}
-        ${c.fecha?`<span>📅 ${c.fecha}</span>`:''}
-        ${c.num_modelos?`<span>👥 ${c.num_modelos} modelo(s)</span>`:''}
+      ${c.portada?`<div class="camp-cover" style="background-image:url('${c.portada}')"><span class="camp-tipo camp-tipo-over">${c.tipo||'Proyecto'}</span></div>`:''}
+      <div class="camp-body">
+        ${!c.portada?`<span class="camp-tipo">${c.tipo||'Proyecto'}</span>`:''}
+        <div class="camp-title">${c.titulo}</div>
+        <div class="camp-meta">
+          ${c.ciudad?`<span>📍 ${c.ciudad}</span>`:''}
+          ${c.fecha?`<span>📅 ${c.fecha}</span>`:''}
+          ${c.num_modelos?`<span>👥 ${c.num_modelos} modelo(s)</span>`:''}
+        </div>
+        ${c.perfil_buscado?`<div class="camp-perfil"><b>Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
+        <a href="/panel.html" class="camp-cta">Postularme →</a>
       </div>
-      ${c.perfil_buscado?`<div class="camp-perfil"><b>Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
-      <a href="/panel.html" class="camp-cta">Postularme →</a>
     </div>`).join('')
     : `<div style="padding:3rem;text-align:center;color:var(--gray);grid-column:1/-1">No hay campañas activas por el momento. Vuelve pronto.</div>`;
 }
