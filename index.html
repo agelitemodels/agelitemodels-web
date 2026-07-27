@@ -183,6 +183,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
   <ul class="n-links">
     <li><a href="#gallery">Modelos</a></li>
     <li><a href="#catalogo-completo">Catálogo</a></li>
+    <li><a href="#campanas-activas">Campañas</a></li>
     <li><a href="/panel.html">Ser Modelo</a></li>
     <li><a href="#about">Nosotros</a></li>
     <li><a href="#services">Servicios</a></li>
@@ -202,6 +203,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 <div id="mob">
   <button class="mc" id="mc">✕</button>
   <a href="#gallery" class="mnl">Modelos</a>
+  <a href="#campanas-activas" class="mnl">Campañas</a>
   <a href="/panel.html" class="mnl">Ser Modelo</a>
   <a href="#about" class="mnl">Nosotros</a>
   <a href="#services" class="mnl">Servicios</a>
@@ -303,6 +305,22 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 .svc:hover .svc-icon{transform:scale(1.08)}
 .svc-name{font-family:var(--ff-h);font-size:1.4rem;letter-spacing:.04em;color:var(--black);margin-bottom:.7rem}
 .svc-desc{font-size:.79rem;color:var(--gray);line-height:1.72}
+
+/* CAMPAÑAS ACTIVAS (público) */
+.camp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(0,0,0,.07)}
+.camp-card{background:var(--bg);padding:2.2rem;transition:all .32s;position:relative}
+.camp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .32s}
+.camp-card:hover{background:var(--bg2)}
+.camp-card:hover::before{transform:scaleX(1)}
+.camp-tipo{display:inline-block;font-size:7.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-d);background:rgba(200,165,90,.12);padding:.3rem .7rem;margin-bottom:1.1rem}
+.camp-title{font-family:var(--ff-h);font-size:1.5rem;letter-spacing:.03em;color:var(--black);margin-bottom:.5rem;line-height:1.15}
+.camp-meta{font-size:.74rem;color:var(--gray-soft);margin-bottom:1rem;display:flex;gap:.9rem;flex-wrap:wrap}
+.camp-meta span::before{content:'';display:inline-block}
+.camp-perfil{font-size:.8rem;color:var(--gray);line-height:1.6;margin-bottom:1.4rem}
+.camp-perfil b{color:var(--black);font-weight:600}
+.camp-cta{display:inline-flex;align-items:center;gap:.4rem;font-size:8.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:var(--black);padding:.65rem 1.3rem;border:none;cursor:pointer;font-family:var(--ff-b);text-decoration:none;transition:all .28s}
+.camp-cta:hover{background:var(--gold-d)}
+@media(max-width:768px){.camp-grid{grid-template-columns:1fr}}
 
 /* ARTISTS */
 #artists{padding:100px 5vw;background:var(--bg2)}
@@ -574,6 +592,19 @@ footer{background:var(--black);padding:5rem 5vw 2.5rem}
     </div>
     <div id="cat-filters" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2.5rem"></div>
     <div class="gal-grid gal-grid-3 rv" id="cat-full-grid"></div>
+  </div>
+</section>
+
+<!-- CAMPAÑAS ACTIVAS -->
+<section id="campanas-activas">
+  <div class="gal-w">
+    <div class="gal-head">
+      <div><span class="eyebrow rv">Oportunidades Abiertas</span><h2 class="h2 rv d1">Campañas<br>Activas</h2></div>
+      <p class="body-lg rv d2" style="max-width:320px;text-align:right">Proyectos publicados por artistas, marcas y empresas buscando talento ahora mismo.</p>
+    </div>
+    <div class="camp-grid rv" id="camp-grid">
+      <div style="padding:3rem;text-align:center;color:var(--gray);grid-column:1/-1">Cargando campañas...</div>
+    </div>
   </div>
 </section>
 
@@ -1974,6 +2005,33 @@ async function saveOrden(orderedList){
   paintDynamicGrid();
 }
 
+async function loadCampanasActivas(){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/campanas?status=eq.aprobada&plataforma=eq.ag_elite_models&select=id,titulo,tipo,ciudad,fecha,horario,num_modelos,perfil_buscado,descripcion,created_at&order=created_at.desc`,{
+      headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}
+    });
+    const camps = res.ok ? await res.json() : [];
+    paintCampanas(camps);
+  }catch(e){ paintCampanas([]); }
+}
+function paintCampanas(camps){
+  const grid=document.getElementById('camp-grid');
+  if(!grid) return;
+  grid.innerHTML = camps.length ? camps.map(c=>`
+    <div class="camp-card">
+      <span class="camp-tipo">${c.tipo||'Proyecto'}</span>
+      <div class="camp-title">${c.titulo}</div>
+      <div class="camp-meta">
+        ${c.ciudad?`<span>📍 ${c.ciudad}</span>`:''}
+        ${c.fecha?`<span>📅 ${c.fecha}</span>`:''}
+        ${c.num_modelos?`<span>👥 ${c.num_modelos} modelo(s)</span>`:''}
+      </div>
+      ${c.perfil_buscado?`<div class="camp-perfil"><b>Perfil buscado:</b> ${c.perfil_buscado}</div>`:''}
+      <a href="/panel.html" class="camp-cta">Postularme →</a>
+    </div>`).join('')
+    : `<div style="padding:3rem;text-align:center;color:var(--gray);grid-column:1/-1">No hay campañas activas por el momento. Vuelve pronto.</div>`;
+}
+
 window.addEventListener('DOMContentLoaded', async ()=>{
   await checkEditPortal();
   await loadApprovedModels();
@@ -1981,6 +2039,7 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   buildCatalogFilters();
   paintFullCatalog('todas');
   renderAdminPanel();
+  await loadCampanasActivas();
 });
 window.addEventListener('hashchange', ()=>{
   if(window.location.hash === '#admin-panel') renderAdminPanel();

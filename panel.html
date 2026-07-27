@@ -988,10 +988,43 @@ async function renderDashboard(){
     const pend=rows.filter(m=>m.status==='pendiente').length;
     const fotos=rows.filter(m=>m.status==='pendiente-fotos').length;
     const aprob=rows.filter(m=>m.status==='aprobada').length;
+    const rechaz=rows.filter(m=>m.status==='rechazada').length;
     const camps=await sbQ('campanas','plataforma=eq.ag_elite_models');
     const campPend=camps.filter(c=>c.status==='pendiente').length;
-    const ccs=await sbQ('cuentas_cobro','order=created_at.desc&limit=5');
+    const campAprob=camps.filter(c=>c.status==='aprobada');
+    const campRech=camps.filter(c=>c.status==='rechazada').length;
+    const ccsAll=await sbQ('cuentas_cobro','order=created_at.desc');
+    const ccs=ccsAll.slice(0,5);
     const recientes=rows.sort((a,b)=>(b.submitted_at||0)-(a.submitted_at||0)).slice(0,5);
+
+    /* ---- Finanzas ---- */
+    const facturado=camps.reduce((s,c)=>s+(Number(c.valor_total)||0),0);
+    const pagado=camps.filter(c=>c.pago_estado==='pagado').reduce((s,c)=>s+(Number(c.valor_total)||0),0);
+    const pendienteCobro=facturado-pagado;
+    const comisionGanada=camps.filter(c=>c.pago_estado==='pagado').reduce((s,c)=>s+(Number(c.valor_total)||0)*((Number(c.comision_porcentaje)||0)/100),0);
+    const comisionProyectada=campAprob.filter(c=>c.pago_estado!=='pagado').reduce((s,c)=>s+(Number(c.valor_total)||0)*((Number(c.comision_porcentaje)||0)/100),0);
+    const solicitadoModelos=ccsAll.reduce((s,c)=>s+(Number(c.valor)||0),0);
+
+    /* ---- Facturación últimos 6 meses ---- */
+    const mesesEs=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    const hoy=new Date();
+    const buckets=[];
+    for(let i=5;i>=0;i--){
+      const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);
+      buckets.push({y:d.getFullYear(),m:d.getMonth(),label:mesesEs[d.getMonth()],value:0});
+    }
+    camps.forEach(c=>{
+      if(!c.created_at) return;
+      const d=new Date(Number(c.created_at));
+      const b=buckets.find(b=>b.y===d.getFullYear()&&b.m===d.getMonth());
+      if(b) b.value+=Math.round((Number(c.valor_total)||0)/1000);
+    });
+
+    /* ---- Top ciudades modelos aprobadas ---- */
+    const ciudadCount={};
+    rows.filter(m=>m.status==='aprobada'&&m.ciudad).forEach(m=>{ciudadCount[m.ciudad]=(ciudadCount[m.ciudad]||0)+1;});
+    const topCiudades=Object.entries(ciudadCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
+
     el.innerHTML=`
       <div class="metrics">
         <div class="metric-card"><div class="metric-label">Pendientes de revisión</div><div class="metric-val" data-count="${pend}">0</div><div class="metric-sub neutral">Nuevas aplicaciones</div></div>
@@ -999,6 +1032,57 @@ async function renderDashboard(){
         <div class="metric-card"><div class="metric-label">Modelos aprobadas</div><div class="metric-val" data-count="${aprob}">0</div><div class="metric-sub up">✓ Catálogo activo</div></div>
         <div class="metric-card"><div class="metric-label">Campañas pendientes</div><div class="metric-val" data-count="${campPend}">0</div><div class="metric-sub neutral">Por aprobar</div></div>
       </div>
+
+      <div style="margin:.4rem 0 .8rem;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2)">Finanzas</div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Resumen de dinero</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:1.2rem">
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Facturado total</div><div style="font-size:1.25rem;font-weight:600">${fmtCOP(facturado)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Pagado por clientes</div><div style="font-size:1.25rem;font-weight:600;color:#fff">${fmtCOP(pagado)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Pendiente de cobro</div><div style="font-size:1.25rem;font-weight:600">${fmtCOP(pendienteCobro)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Solicitado por modelos</div><div style="font-size:1.25rem;font-weight:600">${fmtCOP(solicitadoModelos)}</div></div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:.9rem;display:grid;grid-template-columns:1fr 1fr;gap:1.1rem">
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Comisión ganada (cobrada)</div><div style="font-size:1.1rem;font-weight:600;color:#fff">${fmtCOP(comisionGanada)}</div></div>
+            <div><div style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray)">Comisión por cobrar</div><div style="font-size:1.1rem;font-weight:600">${fmtCOP(comisionProyectada)}</div></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Facturación últimos 6 meses (en miles)</div></div>
+          ${svgBarChart(buckets.map(b=>({label:b.label,value:b.value,color:'#ffffff'})))}
+        </div>
+      </div>
+
+      <div style="margin:1.6rem 0 .8rem;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2)">Modelos</div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Estado del catálogo</div></div>
+          ${svgBarChart([
+            {label:'Aprobadas',value:aprob,color:'#ffffff'},
+            {label:'Revisión',value:pend,color:'#b3b3b3'},
+            {label:'Fotos',value:fotos,color:'#8a8a8a'},
+            {label:'Rechazadas',value:rechaz,color:'#737373'}
+          ])}
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div class="panel-title">Top ciudades (modelos aprobadas)</div></div>
+          ${topCiudades.length?topCiudades.map(([ciudad,n])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:.82rem">${ciudad}</span>
+              <span style="font-size:.78rem;color:var(--gray)">${n} modelo(s)</span>
+            </div>`).join(''):`<div class="empty"><div class="empty-icon">✦</div>Sin datos de ciudad todavía</div>`}
+        </div>
+      </div>
+
+      <div style="margin:1.6rem 0 .8rem;font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray2)">Campañas</div>
+      <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric-card"><div class="metric-label">Campañas totales</div><div class="metric-val" data-count="${camps.length}">0</div><div class="metric-sub neutral">Todas las marcas</div></div>
+        <div class="metric-card"><div class="metric-label">Aprobadas</div><div class="metric-val" data-count="${campAprob.length}">0</div><div class="metric-sub up">✓ Activas</div></div>
+        <div class="metric-card"><div class="metric-label">Rechazadas</div><div class="metric-val" data-count="${campRech}">0</div><div class="metric-sub neutral">No aprobadas</div></div>
+        <div class="metric-card"><div class="metric-label">Cuentas de cobro</div><div class="metric-val" data-count="${ccsAll.length}">0</div><div class="metric-sub neutral">Generadas en total</div></div>
+      </div>
+
       <div class="grid2">
         <div class="panel">
           <div class="panel-head"><div class="panel-title">Aplicaciones recientes</div><button class="fbtn-outline" onclick="navTo('adm-pendientes')" style="font-size:.68rem;padding:.4rem .8rem">Ver todas</button></div>
