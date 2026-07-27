@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Catálogo completo de modelos profesionales de AG Elite Models — filtra por categoría y encuentra el perfil ideal para tu proyecto.">
+<title>Catálogo de Modelos | AG Elite Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@200;300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f8f8f6;--bg3:#f0ede8;--bg4:#e8e4dd;
+  --black:#0a0a0a;--dark:#1a1a1a;--ink:#111111;--gray:#3a3a3a;--gray-soft:#5a5a5a;--gray2:#c8c8c8;
+  --gold:#C8A55A;--gold-l:#ddb96a;--gold-d:#9c7e3a;
+  --wa:#25D366;
+  --ff-h:'Bebas Neue',sans-serif;
+  --ff-s:'Cormorant Garamond',Georgia,serif;
+  --ff-b:'Inter',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:300;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--gray2)}
+::selection{background:var(--black);color:#fff}
+
+.eyebrow{font-size:9px;font-weight:600;letter-spacing:.5em;text-transform:uppercase;color:var(--gray-soft);display:flex;align-items:center;gap:.9rem;margin-bottom:1rem}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--gray2);flex-shrink:0}
+.h2{font-family:var(--ff-h);font-size:clamp(2.2rem,5vw,4.5rem);line-height:.9;letter-spacing:.02em;color:var(--black);margin-bottom:1.2rem}
+.body-lg{font-family:var(--ff-s);font-size:clamp(1rem,1.5vw,1.18rem);color:var(--gray);line-height:1.85;max-width:560px}
+.divl{width:40px;height:1px;background:var(--black);opacity:.18;margin:1.8rem 0}
+
+.btn{display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 2rem;font-family:var(--ff-b);font-size:10px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;text-decoration:none;cursor:pointer;border:none;transition:all .28s}
+.btn-black{background:var(--black);color:#fff}
+.btn-black:hover{background:var(--dark);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--black);border:1px solid rgba(0,0,0,.25)}
+.btn-outline:hover{border-color:var(--black);transform:translateY(-2px)}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:var(--gold-l);transform:translateY(-2px)}
+.btn-wa{background:var(--wa);color:#fff;border:none}
+.btn-wa:hover{background:#1fba59;transform:translateY(-2px)}
+
+.rv{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.4rem 5vw;display:flex;align-items:center;justify-content:space-between;transition:all .4s;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.06)}
+#nav.sc{background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,.07);padding:1rem 5vw}
+.n-logo{font-family:var(--ff-h);font-size:1.2rem;letter-spacing:.14em;color:var(--black);text-decoration:none;display:flex;flex-direction:column;line-height:1.1}
+.n-logo em{font-style:normal;font-size:6.5px;font-family:var(--ff-b);letter-spacing:.45em;color:var(--gray-soft);font-weight:400;margin-top:3px;text-transform:uppercase}
+.n-links{display:flex;gap:2.3rem;list-style:none}
+.n-links a{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .25s}
+.n-links a:hover{color:var(--black)}
+.n-right{display:flex;align-items:center;gap:.8rem}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px;background:none;border:none}
+.hbg span{width:20px;height:1px;background:var(--black);display:block;transition:all .28s}
+.hbg.op span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.hbg.op span:nth-child(2){opacity:0}
+.hbg.op span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+#mob{display:none;position:fixed;inset:0;z-index:999;background:rgba(255,255,255,.99);flex-direction:column;align-items:center;justify-content:center;gap:2.3rem}
+#mob.op{display:flex}
+#mob a{font-family:var(--ff-h);font-size:2.6rem;color:var(--ink);text-decoration:none;letter-spacing:.06em;transition:color .25s}
+#mob a:hover{color:var(--gold-d)}
+#mob .mc{position:absolute;top:1.8rem;right:1.8rem;background:none;border:1px solid rgba(0,0,0,.18);color:var(--black);width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem}
+
+/* HERO */
+#hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--bg);overflow:hidden}
+.hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:8vw 4vw 8vw 5vw;position:relative;z-index:2}
+.hero-right{position:relative;overflow:hidden;background:var(--bg3)}
+.hero-right img{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block}
+.hero-tag{display:inline-flex;align-items:center;gap:.7rem;font-size:8px;font-weight:700;letter-spacing:.4em;text-transform:uppercase;color:var(--gray);margin-bottom:2rem;animation:fU .8s ease .1s both}
+.hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--wa);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.hero-h1{font-family:var(--ff-h);font-size:clamp(5rem,12vw,11rem);line-height:.85;letter-spacing:.02em;color:var(--black);margin-bottom:1.8rem;animation:fU .85s ease .2s both}
+.hero-h1 .stroke{color:var(--black)}
+.hero-sub{font-family:var(--ff-s);font-size:clamp(1rem,1.4vw,1.18rem);color:var(--gray);max-width:420px;margin-bottom:2.5rem;line-height:1.75;animation:fU .8s ease .35s both}
+.hero-btns{display:flex;gap:.8rem;flex-wrap:wrap;animation:fU .8s ease .45s both}
+.hero-stats{position:absolute;bottom:3rem;left:5vw;display:flex;gap:3rem;animation:fI 1s ease 1s both}
+.hs .n{font-family:var(--ff-h);font-size:2.5rem;color:var(--black);line-height:1}
+.hs .l{font-size:7.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--gray-soft)}
+.hero-scroll{position:absolute;bottom:3rem;right:5vw;display:flex;flex-direction:column;align-items:center;gap:.5rem;font-size:7.5px;letter-spacing:.35em;text-transform:uppercase;color:var(--gray-soft);animation:fI 1s ease 1.2s both}
+.scroll-ln{width:1px;height:44px;background:linear-gradient(to bottom,var(--black),transparent);animation:sP 2.2s ease infinite}
+@keyframes sP{0%,100%{opacity:.3}50%{opacity:.8}}
+@keyframes fU{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes fI{from{opacity:0}to{opacity:1}}
+
+/* MARQUEE */
+.mq{overflow:hidden;border-top:1px solid rgba(0,0,0,.08);border-bottom:1px solid rgba(0,0,0,.08);padding:.9rem 0;background:var(--bg2);position:relative;z-index:1}
+.mq-t{display:flex;width:max-content;animation:mS 24s linear infinite}
+.mq-t:hover{animation-play-state:paused}
+.mi{display:flex;align-items:center;gap:2rem;padding:0 2rem;font-size:8.5px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:var(--gray-soft);white-space:nowrap}
+.mi .dot{width:2px;height:2px;border-radius:50%;background:var(--gray2);flex-shrink:0}
+@keyframes mS{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* GALLERY */
+#gallery{padding:120px 5vw;background:var(--bg2)}
+.gal-w{max-width:1300px;margin:0 auto}
+.gal-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4rem;gap:2rem;flex-wrap:wrap}
+.gal-filters{display:flex;gap:.5rem;flex-wrap:wrap}
+.gf{background:transparent;border:1px solid rgba(0,0,0,.15);color:var(--gray);font-family:var(--ff-b);font-size:8.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;padding:.45rem 1.1rem;cursor:pointer;transition:all .25s}
+.gf:hover,.gf.act{border-color:var(--black);color:var(--black)}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.gal-grid-3{grid-template-columns:repeat(3,1fr);max-width:1100px;margin:0 auto}
+.gal-grid-3 .mc{aspect-ratio:3/4}
+.mc{position:relative;overflow:hidden;cursor:pointer;background:var(--bg3);aspect-ratio:2/3}
+.mc-bg{position:absolute;inset:0;transition:transform .55s ease}
+.mc:hover .mc-bg{transform:scale(1.05)}
+.mc-img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.mc-ph{width:100%;height:100%}
+.mp2{background:linear-gradient(160deg,#d4cfc8,#c8c2b8,#b8b0a5)}
+.mp3{background:linear-gradient(155deg,#c5c8cc,#b8bcc2,#a8adb5)}
+.mp4{background:linear-gradient(165deg,#d0cbc4,#c4bdb4,#b5aca0)}
+.mp5{background:linear-gradient(150deg,#c8cdd2,#bcc2c8,#adb5bc)}
+.mp6{background:linear-gradient(158deg,#cccac5,#c0bdb6,#b3afa8)}
+.mp7{background:linear-gradient(162deg,#c6cad0,#bbbfc8,#afb4be)}
+.mp8{background:linear-gradient(156deg,#d2cdc6,#c6c0b8,#b8b0a5)}
+.mc-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 0%,rgba(0,0,0,.2) 45%,transparent 75%)}
+.mc-body{position:absolute;bottom:0;left:0;right:0;padding:1.3rem;transform:translateY(38%);transition:transform .38s ease}
+.mc:hover .mc-body{transform:none}
+.mc-name{font-family:var(--ff-h);font-size:1.18rem;letter-spacing:.04em;color:#fff;margin-bottom:.28rem}
+.mc-meta{display:flex;flex-wrap:wrap;gap:.25rem .8rem;font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.6rem}
+.mc-tag{display:inline-block;font-size:7px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--black);background:#fff;padding:.18rem .6rem;margin-bottom:.7rem;opacity:0;transform:translateY(6px);transition:all .3s .05s}
+.mc:hover .mc-tag{opacity:1;transform:none}
+.mc-cta{display:inline-flex;align-items:center;gap:.4rem;font-size:8px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#fff;background:var(--wa);padding:.3rem .8rem;opacity:0;transform:translateY(6px);transition:all .3s .1s;border:none;cursor:pointer;font-family:var(--ff-b)}
+.mc:hover .mc-cta{opacity:1;transform:none}
+.mc-num{position:absolute;top:1rem;right:1rem;font-family:var(--ff-h);font-size:.62rem;color:rgba(255,255,255,.25);letter-spacing:.06em}
+
+/* PROFILE MODAL */
+#profile-modal-sara{display:none;position:fixed;inset:0;z-index:2000;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);overflow-y:auto}
+#profile-modal-sara.open{display:block}
+#profile-modal-mj{display:none;position:fixed;inset:0;z-index:2000;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);overflow-y:auto}
+#profile-modal-mj.open{display:block}
+#profile-modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);overflow-y:auto}
+#profile-modal.open{display:block}
+.pm-inner{max-width:1100px;margin:0 auto;padding:6rem 4vw 4rem}
+.pm-close{position:fixed;top:2rem;right:2rem;background:var(--black);border:none;color:#fff;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;z-index:10}
+.pm-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:4rem;align-items:start}
+.pm-main{aspect-ratio:3/4;overflow:hidden;margin-bottom:4px;background:var(--bg3)}
+.pm-main img{width:100%;height:100%;object-fit:cover;object-position:top}
+.pm-thumbs{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.pm-thumb{aspect-ratio:2/3;overflow:hidden;cursor:pointer;background:var(--bg3)}
+.pm-thumb img{width:100%;height:100%;object-fit:cover;object-position:top;transition:transform .4s;display:block}
+.pm-thumb:hover img{transform:scale(1.04)}
+.pm-info{position:sticky;top:6rem}
+.pm-name{font-family:var(--ff-h);font-size:3.5rem;letter-spacing:.04em;color:var(--black);line-height:.9;margin-bottom:.5rem}
+.pm-art{font-family:var(--ff-s);font-size:1.1rem;font-style:italic;color:var(--gray);margin-bottom:2rem}
+.pm-stats{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:2rem}
+.pm-stat{background:var(--bg2);padding:1rem;border:1px solid rgba(0,0,0,.07)}
+.pm-stat-l{font-size:7.5px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--gray-soft);margin-bottom:.3rem}
+.pm-stat-v{font-family:var(--ff-h);font-size:1.1rem;letter-spacing:.04em;color:var(--black)}
+.pm-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:2rem}
+.pm-tag{font-size:7.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--black);border:1px solid rgba(0,0,0,.18);padding:.3rem .8rem}
+.pm-divider{height:1px;background:rgba(0,0,0,.09);margin:1.5rem 0}
+.pm-btns{display:flex;flex-direction:column;gap:.7rem}
+
+/* MODAL SOLICITAR */
+#modal{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1.5rem}
+#modal.open{display:flex}
+.modal-box{background:#fff;padding:2.8rem;width:100%;max-width:520px;position:relative;animation:mIn .32s ease;max-height:90vh;overflow-y:auto}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(14px)}to{opacity:1;transform:none}}
+.modal-close{position:absolute;top:1.2rem;right:1.2rem;background:none;border:1px solid rgba(0,0,0,.15);color:var(--black);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s}
+.modal-close:hover{border-color:var(--black)}
+.modal-h{font-family:var(--ff-h);font-size:1.8rem;letter-spacing:.05em;color:var(--black);margin-bottom:.25rem}
+.modal-s{font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gray-soft);margin-bottom:1.8rem}
+.modal-tag{display:flex;align-items:center;gap:.9rem;background:var(--bg2);border:1px solid rgba(0,0,0,.09);padding:.9rem 1.1rem;margin-bottom:1.8rem}
+.fg{display:flex;flex-direction:column;gap:.32rem;margin-bottom:.8rem}
+.fl{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gray)}
+.fi,.fsl,.fta{background:var(--bg2);border:1px solid rgba(0,0,0,.12);border-bottom:1px solid rgba(0,0,0,.35);color:var(--black);font-family:var(--ff-b);font-size:.85rem;font-weight:300;padding:.78rem 1rem;outline:none;transition:all .25s;width:100%;-webkit-appearance:none}
+.fi::placeholder,.fta::placeholder{color:rgba(0,0,0,.32)}
+.fi:focus,.fsl:focus,.fta:focus{border-color:var(--black);background:#fff}
+.fsl option{background:#fff}
+.fta{resize:vertical;min-height:80px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="index.html#hero" class="n-logo">AG ELITE MODELS<em>Elite Talent Agency</em></a>
+  <ul class="n-links">
+    <li><a href="index.html#gallery">Modelos</a></li>
+    <li><a href="catalogo.html" style="color:var(--gold-d)">Catálogo</a></li>
+    <li><a href="index.html#campanas-activas">Campañas</a></li>
+    <li><a href="/panel.html">Ser Modelo</a></li>
+    <li><a href="index.html#about">Nosotros</a></li>
+    <li><a href="index.html#services">Servicios</a></li>
+    <li><a href="index.html#contact">Contacto</a></li>
+  </ul>
+  <div class="n-right">
+    <a href="/panel.html" class="btn btn-outline" style="font-size:9px;padding:.55rem 1.1rem">Iniciar Sesión</a>
+    <a href="https://www.instagram.com/agelitemodels/" target="_blank" class="btn btn-outline" style="font-size:9px;padding:.55rem 1.1rem">Instagram</a>
+    <a href="https://www.tiktok.com/@ag.elite.models" target="_blank" class="btn btn-outline" style="font-size:9px;padding:.55rem 1.1rem">TikTok</a>
+    <a href="https://wa.me/573127444324" target="_blank" class="btn btn-wa" style="font-size:9px;padding:.55rem 1.2rem">WhatsApp</a>
+  </div>
+  <button class="hbg" id="hbg"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mob">
+  <button class="mc" id="mc">✕</button>
+  <a href="index.html#gallery" class="mnl">Modelos</a>
+  <a href="catalogo.html" class="mnl">Catálogo</a>
+  <a href="index.html#campanas-activas" class="mnl">Campañas</a>
+  <a href="/panel.html" class="mnl">Ser Modelo</a>
+  <a href="index.html#about" class="mnl">Nosotros</a>
+  <a href="index.html#services" class="mnl">Servicios</a>
+  <a href="index.html#contact" class="mnl">Contacto</a>
+</div>
+
+<!-- CATÁLOGO COMPLETO -->
+<section id="catalogo-completo" style="padding:150px 5vw 120px">
+  <div class="gal-w">
+    <div class="gal-head">
+      <div><span class="eyebrow rv">Portafolio Completo</span><h2 class="h2 rv d1">Catálogo de<br>Modelos</h2></div>
+      <p class="body-lg rv d2" style="max-width:320px;text-align:right">Filtra por categoría para encontrar el perfil ideal para tu proyecto.</p>
+    </div>
+    <div id="cat-filters" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2.5rem"></div>
+    <div class="gal-grid gal-grid-3 rv" id="cat-full-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem 0;color:var(--gray)">Cargando catálogo...</div>
+    </div>
+  </div>
+</section>
+
+<div id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-h">Solicitar Modelo</div>
+    <div class="modal-s">Te respondemos por WhatsApp en menos de 24h</div>
+    <div class="modal-tag"><span style="font-size:1.2rem">⭐</span><div><div style="font-family:var(--ff-h);font-size:1rem;letter-spacing:.04em" id="m-name">Modelo</div><div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray-soft)" id="m-spec">Especialidad</div></div></div>
+    <div class="frow" style="margin-bottom:.8rem"><div class="fg"><label class="fl">Tu nombre</label><input type="text" class="fi" id="f-nombre" placeholder="Nombre completo"></div><div class="fg"><label class="fl">Empresa / Artista</label><input type="text" class="fi" id="f-empresa" placeholder="Nombre"></div></div>
+    <div class="fg"><label class="fl">Tipo de proyecto</label><select class="fsl" id="f-tipo"><option value="">Selecciona</option><option>Video Musical</option><option>Campaña Publicitaria</option><option>TikTok</option><option>Producción Audiovisual</option><option>Evento Corporativo</option><option>Fotografía Comercial</option><option>Otro</option></select></div>
+    <div class="frow" style="margin-bottom:.8rem"><div class="fg"><label class="fl">Fecha</label><input type="date" class="fi" id="f-fecha"></div><div class="fg"><label class="fl">Presupuesto</label><select class="fsl" id="f-budget"><option value="">Selecciona</option><option>Menos de $500k</option><option>$500k – $1.5M</option><option>$1.5M – $3M</option><option>Más de $3M</option></select></div></div>
+    <div class="fg"><label class="fl">Detalles</label><textarea class="fta" id="f-msg" placeholder="Locación, duración, referencias..."></textarea></div>
+    <button type="button" class="btn btn-wa" style="width:100%;margin-top:1.3rem;padding:.9rem;font-size:10px;letter-spacing:.22em;justify-content:center" onclick="sendWhatsApp()">📲 Enviar por WhatsApp</button>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-w">
+    <div class="ft-top">
+      <div>
+        <div class="fb-name">AG ELITE MODELS</div>
+        <div class="fb-sub">Elite Talent Agency · Medellín, Colombia</div>
+        <p class="fb-desc">Representamos talento profesional para videos musicales, campañas, TikTok y producciones de alto nivel.</p>
+        <div class="fb-soc">
+          <a href="#" class="fsoc">📷</a>
+          <a href="https://wa.me/573127444324" target="_blank" class="fsoc">💬</a>
+          <a href="#" class="fsoc">🎵</a>
+          <a href="mailto:agelitemodelscontact@gmail.com" class="fsoc">✉</a>
+        </div>
+      </div>
+      <div><div class="fc-t">Servicios</div><ul class="fl-l"><li><a href="index.html#services">Videos Musicales</a></li><li><a href="index.html#services">Campañas Publicitarias</a></li><li><a href="index.html#services">Eventos Corporativos</a></li><li><a href="index.html#services">Fotografía Comercial</a></li></ul></div>
+      <div><div class="fc-t">Agencia</div><ul class="fl-l"><li><a href="index.html#gallery">Nuestras Modelos</a></li><li><a href="/panel.html">Ser Modelo</a></li><li><a href="index.html#about">Sobre Nosotros</a></li><li><a href="index.html#artists">Artistas</a></li><li><a href="https://eldellente.wixsite.com/website" target="_blank">Psycho Production</a></li></ul></div>
+      <div><div class="fc-t">Contacto</div><ul class="fl-l"><li><a href="https://wa.me/573127444324">+57 312 744 4324</a></li><li><a href="mailto:agelitemodelscontact@gmail.com">agelitemodelscontact@gmail.com</a></li><li><a href="https://www.instagram.com/agelitemodels/" target="_blank">@agelitemodels</a></li><li><a href="https://www.tiktok.com/@ag.elite.models" target="_blank">@ag.elite.models</a></li><li>Medellín, Colombia</li></ul><div style="margin-top:1.5rem;display:flex;gap:.6rem;flex-wrap:wrap"><a href="https://wa.me/573127444324" target="_blank" class="btn btn-wa" style="font-size:8.5px;padding:.5rem 1.1rem">WhatsApp</a><a href="https://www.instagram.com/agelitemodels/" target="_blank" class="btn btn-outline" style="font-size:8.5px;padding:.5rem 1.1rem">Instagram</a><a href="https://www.tiktok.com/@ag.elite.models" target="_blank" class="btn btn-outline" style="font-size:8.5px;padding:.5rem 1.1rem">TikTok</a></div></div>
+    </div>
+    <div class="ft-bot"><div class="ft-copy">© 2026 AG Elite Models · Psycho Production. Todos los derechos reservados.</div><div class="ft-tag">Representando la excelencia en imagen y talento.</div></div>
+  </div>
+</footer>
+
+<a href="https://wa.me/573127444324?text=Hola%20AG%20Elite%20Models!" target="_blank" id="wa-float">💬</a>
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* NAV */
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>{nav.classList.toggle('sc',window.scrollY>60);document.getElementById('btt').classList.toggle('show',window.scrollY>500)});
+
+/* MOB NAV */
+const hbg=document.getElementById('hbg'),mob=document.getElementById('mob');
+hbg.addEventListener('click',()=>{hbg.classList.toggle('op');mob.classList.toggle('op')});
+document.getElementById('mc').addEventListener('click',()=>{hbg.classList.remove('op');mob.classList.remove('op')});
+document.querySelectorAll('.mnl').forEach(l=>l.addEventListener('click',()=>{hbg.classList.remove('op');mob.classList.remove('op')}));
+
+/* REVEAL */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')}),{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+
+/* MODEL REQUEST MODAL */
+let curModel='';
+function openModal(name,meta,spec){curModel=name;document.getElementById('m-name').textContent=name+' — '+meta;document.getElementById('m-spec').textContent=spec;document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden'}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow=''}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+function sendWhatsApp(){
+  const n=document.getElementById('f-nombre').value||'No especificado';
+  const e=document.getElementById('f-empresa').value||'No especificado';
+  const t=document.getElementById('f-tipo').value||'No especificado';
+  const f=document.getElementById('f-fecha').value||'No especificada';
+  const b=document.getElementById('f-budget').value||'No especificado';
+  const m=document.getElementById('f-msg').value||'Sin detalles';
+  const txt='Hola AG Elite Models! \uD83D\uDC4B\n\n*SOLICITUD DE MODELO*\n\n\u2B50 Modelo solicitada: *'+curModel+'*\n\n\uD83D\uDCCB Mis datos:\n\u2022 Nombre: '+n+'\n\u2022 Empresa/Artista: '+e+'\n\u2022 Tipo de proyecto: '+t+'\n\u2022 Fecha: '+f+'\n\u2022 Presupuesto: '+b+'\n\n\uD83D\uDCDD Detalles:\n'+m+'\n\n_Enviado desde agelitemodels.com_';
+  window.open('https://wa.me/573127444324?text='+encodeURIComponent(txt),'_blank');
+  closeModal();
+}
+
+/* ============ SUPABASE ============ */
+const SUPABASE_URL = 'https://vzgzalcvkzttsrjlisfs.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_bek0hK20motWCQ4a5qznEA_GmyXhs93';
+
+async function dbSelectAll(){
+  try{
+    const res = await fetch(SUPABASE_URL + '/rest/v1/models?select=*', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    if(!res.ok) return [];
+    return await res.json();
+  }catch(e){ console.error('dbSelectAll error', e); return []; }
+}
+
+function fotoPos(fotosPos,i){
+  const v=fotosPos&&fotosPos[i];
+  return (v===undefined||v===null||v==='')?0:Number(v);
+}
+function rowToModel(r){
+  return {
+    id: r.id, nombreCompleto: r.nombre_completo, nombreArtistico: r.nombre_artistico,
+    edad: r.edad, ciudad: r.ciudad, nacionalidad: r.nacionalidad, idiomas: r.idiomas,
+    whatsapp: r.whatsapp, email: r.email, instagram: r.instagram, tiktok: r.tiktok,
+    estatura: r.estatura, medidas: r.medidas, cabello: r.cabello, ojos: r.ojos,
+    tallaRopa: r.talla_ropa, tallaCalzado: r.talla_calzado, tatuajes: r.tatuajes,
+    categorias: r.categorias || [], marcas: r.marcas, videoclips: r.videoclips,
+    experiencia: r.experiencia, disponibleViajar: r.disponible_viajar, pasaporte: r.pasaporte,
+    internacional: r.internacional, videoPresentacion: r.video_presentacion,
+    fotos: r.fotos || [], fotosPos: r.fotos_pos || [], status: r.status,
+    submittedAt: r.submitted_at, approvedAt: r.approved_at,
+    destacada: r.destacada || false, orden: r.orden || 0
+  };
+}
+
+let approvedModels = [];
+async function loadApprovedModels(){
+  const rows = await dbSelectAll();
+  const models = rows.map(rowToModel).filter(m => m.status === 'aprobada');
+  const featured = models.filter(m=>m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
+  const rest = models.filter(m=>!m.destacada).sort((a,b)=>(b.approvedAt||0)-(a.approvedAt||0));
+  approvedModels = [...featured, ...rest];
+}
+
+function modelCardHTML(m, numLabel){
+  const fotos = m.fotos || [];
+  const cover = fotos[0] || '';
+  const catStr = (m.categorias||[]).join(' · ');
+  const safeName = m.nombreArtistico.replace(/'/g,"\\'");
+  return `<div class="mc" data-cat="${(m.categorias||[]).join(' ').toLowerCase()}" onclick='openDynamicProfile(${JSON.stringify(m).replace(/'/g,"&#39;")})'>
+    <div class="mc-bg"><img class="mc-img" src="${cover}" alt="${safeName}" style="width:100%;height:100%;object-fit:cover;object-position:center ${fotoPos(m.fotosPos,0)}%"></div>
+    <div class="mc-ov"></div><div class="mc-num">${numLabel}</div>
+    <div class="mc-body">
+      <div class="mc-name">${m.nombreArtistico}</div>
+      <div class="mc-meta"><span>${m.edad?m.edad+' años':''}</span><span>${m.estatura?m.estatura+'m':''}</span><span>${m.ciudad||''}</span></div>
+      <div class="mc-tag">${catStr}</div><br>
+      <button class="mc-cta" onclick="event.stopPropagation();openModal('${safeName}','${m.edad||''} años · ${m.estatura||''}m · ${m.ciudad||''}','${catStr}')">💬 Solicitar</button>
+    </div>
+  </div>`;
+}
+
+function paintFullCatalog(filter){
+  const grid = document.getElementById('cat-full-grid');
+  if(!grid) return;
+  const all = approvedModels;
+  const filtered = !filter || filter==='todas' ? all : all.filter(m=>(m.categorias||[]).map(c=>c.toLowerCase()).includes(filter.toLowerCase()));
+  grid.innerHTML = filtered.length
+    ? filtered.map((m,i)=>modelCardHTML(m, String(i+1).padStart(2,'0'))).join('')
+    : `<div style="grid-column:1/-1;text-align:center;padding:3rem 0;color:var(--gray)">No hay modelos en esta categoría todavía.</div>`;
+}
+
+function buildCatalogFilters(){
+  const cats = new Set(['todas']);
+  approvedModels.forEach(m=>(m.categorias||[]).forEach(c=>cats.add(c)));
+  const wrap = document.getElementById('cat-filters');
+  if(!wrap) return;
+  wrap.innerHTML = [...cats].map(c=>`<button type="button" class="btn btn-outline cat-fbtn" data-cat="${c}" style="font-size:9px;padding:.6rem 1.2rem">${c}</button>`).join('');
+  wrap.querySelectorAll('.cat-fbtn').forEach(btn=>{
+    btn.onclick = ()=> paintFullCatalog(btn.dataset.cat);
+  });
+}
+
+function openDynamicProfile(m){
+  const fotos = m.fotos || [];
+  const safeName = m.nombreArtistico;
+  let root = document.getElementById('dynamic-profile-root');
+  if(!root){
+    root = document.createElement('div');
+    root.id = 'dynamic-profile-root';
+    document.body.appendChild(root);
+  }
+  root.innerHTML = `
+    <div style="display:block;position:fixed;inset:0;z-index:2000;background:rgba(255,255,255,.98);backdrop-filter:blur(16px);overflow-y:auto">
+      <button onclick="document.getElementById('dynamic-profile-root').innerHTML='';document.body.style.overflow=''" style="position:fixed;top:1.5rem;right:1.5rem;width:42px;height:42px;border-radius:50%;background:var(--black);color:#fff;font-size:1rem;z-index:10">✕</button>
+      <div style="max-width:1000px;margin:0 auto;padding:5rem 2rem 4rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem">
+          <div>
+            <div style="aspect-ratio:3/4;border-radius:3px;overflow:hidden;background:#eee"><img id="dp-main-img" src="${fotos[0]||''}" style="width:100%;height:100%;object-fit:cover;object-position:center ${fotoPos(m.fotosPos,0)}%"></div>
+            <div style="display:flex;gap:.6rem;margin-top:.8rem;flex-wrap:wrap">
+              ${fotos.map((f,i)=>`<div style="width:60px;height:60px;border-radius:2px;overflow:hidden;cursor:pointer;opacity:.7" onclick="document.getElementById('dp-main-img').src='${f}';document.getElementById('dp-main-img').style.objectPosition='center ${fotoPos(m.fotosPos,i)}%'"><img src="${f}" style="width:100%;height:100%;object-fit:cover;object-position:center ${fotoPos(m.fotosPos,i)}%"></div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--ff-h);font-size:2.6rem;line-height:1">${safeName}</div>
+            <div style="font-size:1.1rem;color:var(--gray);margin:.3rem 0 1.5rem">${m.ciudad||''}${m.ciudad?', Colombia':''}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1.3rem">
+              ${m.edad?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Edad</div><div style="font-size:.95rem;font-weight:600">${m.edad} años</div></div>`:''}
+              ${m.estatura?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Estatura</div><div style="font-size:.95rem;font-weight:600">${m.estatura} cm</div></div>`:''}
+              ${m.tallaRopa?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Talla</div><div style="font-size:.95rem;font-weight:600">${m.tallaRopa}${m.tallaCalzado?' | Calzado '+m.tallaCalzado:''}</div></div>`:''}
+              ${m.medidas?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Medidas</div><div style="font-size:.95rem;font-weight:600">${m.medidas}</div></div>`:''}
+              ${m.cabello?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Cabello</div><div style="font-size:.95rem;font-weight:600">${m.cabello}</div></div>`:''}
+              ${m.ojos?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Ojos</div><div style="font-size:.95rem;font-weight:600">${m.ojos}</div></div>`:''}
+              ${m.nacionalidad?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Nacionalidad</div><div style="font-size:.95rem;font-weight:600">${m.nacionalidad}</div></div>`:''}
+              ${m.idiomas?`<div><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Idiomas</div><div style="font-size:.95rem;font-weight:600">${m.idiomas}</div></div>`:''}
+              ${m.tatuajes&&m.tatuajes!=='No'?`<div style="grid-column:1/-1"><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray)">Tatuajes</div><div style="font-size:.95rem;font-weight:600">${m.tatuajes}</div></div>`:''}
+            </div>
+            ${(m.categorias||[]).length?`<div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem">${(m.categorias||[]).map(c=>`<span style="font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;background:var(--bg2);border:1px solid rgba(0,0,0,.1);padding:.35rem .8rem;border-radius:20px">${c}</span>`).join('')}</div>`:''}
+            ${(m.disponibleViajar||m.pasaporte||m.internacional)?`<div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem">${m.disponibleViajar?'<span style="font-size:.68rem;background:#e8f5e9;color:#2e7d32;padding:.3rem .8rem;border-radius:20px">✈ Disponible para viajar</span>':''}${m.pasaporte?'<span style="font-size:.68rem;background:#e3f2fd;color:#1565c0;padding:.3rem .8rem;border-radius:20px">🛂 Pasaporte vigente</span>':''}${m.internacional?'<span style="font-size:.68rem;background:#f3e5f5;color:#6a1b9a;padding:.3rem .8rem;border-radius:20px">🌍 Internacional</span>':''}</div>`:''} 
+            ${m.marcas?`<div style="margin-bottom:1rem"><div style="font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gray);margin-bottom:.3rem">Marcas / Experiencia</div><div style="font-size:.88rem;color:#333;line-height:1.6">${m.marcas}</div></div>`:''}
+            ${m.experiencia?`<div style="font-size:.95rem;line-height:1.7;color:#333;margin-bottom:1.5rem">${m.experiencia}</div>`:''}
+            <a href="https://wa.me/573127444324?text=${encodeURIComponent('Hola AG Elite Models! Me interesa '+safeName+' para mi proyecto')}" target="_blank" class="btn btn-black" style="width:100%;justify-content:center">💬 Solicitar por WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.body.style.overflow='hidden';
+}
+
+window.addEventListener('DOMContentLoaded', async ()=>{
+  await loadApprovedModels();
+  buildCatalogFilters();
+  paintFullCatalog('todas');
+});
+</script>
+</body>
+</html>

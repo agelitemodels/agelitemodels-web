@@ -182,7 +182,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
   <a href="#hero" class="n-logo">AG ELITE MODELS<em>Elite Talent Agency</em></a>
   <ul class="n-links">
     <li><a href="#gallery">Modelos</a></li>
-    <li><a href="#catalogo-completo">Catálogo</a></li>
+    <li><a href="catalogo.html" target="_blank">Catálogo</a></li>
     <li><a href="#campanas-activas">Campañas</a></li>
     <li><a href="/panel.html">Ser Modelo</a></li>
     <li><a href="#about">Nosotros</a></li>
@@ -203,6 +203,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--ff-b);font-weight:3
 <div id="mob">
   <button class="mc" id="mc">✕</button>
   <a href="#gallery" class="mnl">Modelos</a>
+  <a href="catalogo.html" class="mnl" target="_blank">Catálogo</a>
   <a href="#campanas-activas" class="mnl">Campañas</a>
   <a href="/panel.html" class="mnl">Ser Modelo</a>
   <a href="#about" class="mnl">Nosotros</a>
@@ -578,7 +579,7 @@ footer{background:var(--black);padding:5rem 5vw 2.5rem}
     </div>
     <div class="gal-grid gal-grid-3 rv" id="dynamic-models-grid"></div>
     <div style="text-align:center;margin-top:3.5rem" class="rv">
-      <a href="#catalogo-completo" class="btn btn-black" style="font-size:11px;padding:1.1rem 3rem">Ver Catálogo Completo →</a>
+      <a href="catalogo.html" target="_blank" class="btn btn-black" style="font-size:11px;padding:1.1rem 3rem">Ver Catálogo Completo →</a>
       <p style="font-size:.78rem;color:var(--gray);margin-top:1.2rem">¿Buscas un perfil específico? <a href="https://wa.me/573127444324?text=Hola%20AG%20Elite%20Models%2C%20busco%20un%20perfil%20especifico%20para%20mi%20proyecto" target="_blank" style="color:var(--black);text-decoration:underline">Cuéntanos por WhatsApp</a></p>
     </div>
   </div>
@@ -597,19 +598,6 @@ footer{background:var(--black);padding:5rem 5vw 2.5rem}
     <button type="button" class="btn btn-wa" style="width:100%;margin-top:1.3rem;padding:.9rem;font-size:10px;letter-spacing:.22em;justify-content:center" onclick="sendWhatsApp()">📲 Enviar por WhatsApp</button>
   </div>
 </div>
-
-<!-- REGISTRO MODELOS - PROTAGONISTA -->
-<!-- CATÁLOGO COMPLETO -->
-<section id="catalogo-completo">
-  <div class="gal-w">
-    <div class="gal-head">
-      <div><span class="eyebrow rv">Portafolio Completo</span><h2 class="h2 rv d1">Catálogo de<br>Modelos</h2></div>
-      <p class="body-lg rv d2" style="max-width:320px;text-align:right">Filtra por categoría para encontrar el perfil ideal para tu proyecto.</p>
-    </div>
-    <div id="cat-filters" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:2.5rem"></div>
-    <div class="gal-grid gal-grid-3 rv" id="cat-full-grid"></div>
-  </div>
-</section>
 
 <!-- CAMPAÑAS ACTIVAS -->
 <section id="campanas-activas">
@@ -2052,8 +2040,6 @@ window.addEventListener('DOMContentLoaded', async ()=>{
   await checkEditPortal();
   await loadApprovedModels();
   paintDynamicGrid();
-  buildCatalogFilters();
-  paintFullCatalog('todas');
   renderAdminPanel();
   await loadCampanasActivas();
 });
