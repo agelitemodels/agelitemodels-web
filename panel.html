@@ -2147,45 +2147,77 @@ async function admGuardarModelo(){
   }
 }
 
-/* ============ ADMIN — ORDEN DEL CATÁLOGO ============ */
+/* ============ ADMIN — ORDEN DEL CATÁLOGO (VISTA TIPO CATÁLOGO REAL) ============ */
+let _admOrdenList=[];
 async function renderAdmOrden(){
   const el=document.getElementById('main-content');
   el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
   const rows=await sbQ('models');
-  const aprobadas=rows.filter(m=>m.status==='aprobada').sort((a,b)=>(a.orden||0)-(b.orden||0));
-  if(!aprobadas.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden del Catálogo</div><div class="empty" style="padding:4rem"><div class="empty-icon">⬍</div>No hay modelos aprobadas todavía.</div>`;return;}
-  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden del Catálogo (${aprobadas.length})</div><p style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">Arrastra para cambiar el orden en que aparecen en el catálogo público y en "Talento Destacado". La estrella marca quién sale en el carrusel destacado de la portada.</p>
-    <div id="orden-list">${aprobadas.map((m,i)=>`
-      <div class="panel orden-card" draggable="true" data-id="${m.id}" style="display:flex;align-items:center;gap:1rem;margin-bottom:.6rem;cursor:grab">
-        <span style="color:var(--gray2)">⠿</span>
-        <div class="model-foto">${m.fotos&&m.fotos[0]?`<img src="${m.fotos[0]}" style="object-position:center ${mFotoPos(m.fotos_pos,0)}%">`:''}</div>
-        <div style="flex:1;font-weight:500">${m.nombre_artistico||''}</div>
-        <button onclick="event.stopPropagation();admToggleStarOrden('${m.id}')" style="background:none;border:1px solid ${m.destacada?'var(--gold)':'var(--border)'};color:${m.destacada?'var(--gold)':'var(--gray)'};padding:.4rem .7rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)">${m.destacada?'★ Destacada':'☆ Destacar'}</button>
-        <div style="font-size:1.6rem;color:var(--gray2);font-weight:700">${String(i+1).padStart(2,'0')}</div>
-      </div>`).join('')}</div>`;
+  _admOrdenList=rows.filter(m=>m.status==='aprobada').sort((a,b)=>(a.orden||0)-(b.orden||0));
+  if(!_admOrdenList.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden del Catálogo</div><div class="empty" style="padding:4rem"><div class="empty-icon">⬍</div>No hay modelos aprobadas todavía.</div>`;return;}
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:.6rem">
+      <div style="font-size:.9rem;font-weight:500">Orden del Catálogo (${_admOrdenList.length})</div>
+      <input type="text" id="orden-buscar" placeholder="🔍 Buscar modelo por nombre..." oninput="admPintarOrden(this.value)" style="background:var(--bg);color:#fff;border:1px solid var(--border);padding:.5rem .9rem;font-size:.75rem;font-family:var(--ff);min-width:220px">
+    </div>
+    <p style="font-size:.78rem;color:var(--gray);margin-bottom:1.2rem">Así se ve el catálogo público. Arrastra una foto encima de otra para intercambiar su lugar, o usa las flechas. La estrella marca quién sale en "Talento Destacado" de la portada.</p>
+    <div id="orden-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.9rem"></div>`;
+  admPintarOrden('');
+}
+function admPintarOrden(filtro){
+  const list=document.getElementById('orden-list');
+  if(!list) return;
+  const f=(filtro||'').trim().toLowerCase();
+  const visibles=f?_admOrdenList.filter(m=>(m.nombre_artistico||'').toLowerCase().includes(f)||(m.nombre_completo||'').toLowerCase().includes(f)):_admOrdenList;
+  list.innerHTML=visibles.map(m=>{
+    const i=_admOrdenList.findIndex(x=>x.id===m.id);
+    return `
+      <div class="orden-card-grid" draggable="true" data-id="${m.id}" style="position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;cursor:grab;background:var(--bg3);border:2px solid transparent;transition:border-color .15s">
+        ${m.fotos&&m.fotos[0]?`<img src="${m.fotos[0]}" style="width:100%;height:100%;object-fit:cover;object-position:center ${mFotoPos(m.fotos_pos,0)}%;pointer-events:none">`:''}
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 45%,rgba(0,0,0,.35) 100%);pointer-events:none"></div>
+        <div style="position:absolute;top:.4rem;left:.4rem;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.85rem;padding:.15rem .5rem;border-radius:4px">${String(i+1).padStart(2,'0')}</div>
+        <button onclick="event.stopPropagation();admToggleStarOrden('${m.id}')" style="position:absolute;top:.4rem;right:.4rem;background:rgba(0,0,0,.6);border:none;color:${m.destacada?'var(--gold)':'#fff'};padding:.25rem .45rem;font-size:.85rem;cursor:pointer;border-radius:4px">${m.destacada?'★':'☆'}</button>
+        <div style="position:absolute;bottom:.4rem;left:.4rem;right:.4rem;color:#fff;font-size:.72rem;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.nombre_artistico||''}</div>
+        <div style="position:absolute;bottom:.35rem;right:.4rem;display:flex;gap:2px">
+          <button onclick="event.stopPropagation();admMoverOrden('${m.id}',-1)" ${i===0?'disabled':''} style="background:rgba(0,0,0,.6);border:none;color:${i===0?'rgba(255,255,255,.3)':'#fff'};width:20px;height:20px;font-size:.65rem;cursor:${i===0?'default':'pointer'};border-radius:3px">◀</button>
+          <button onclick="event.stopPropagation();admMoverOrden('${m.id}',1)" ${i===_admOrdenList.length-1?'disabled':''} style="background:rgba(0,0,0,.6);border:none;color:${i===_admOrdenList.length-1?'rgba(255,255,255,.3)':'#fff'};width:20px;height:20px;font-size:.65rem;cursor:${i===_admOrdenList.length-1?'default':'pointer'};border-radius:3px">▶</button>
+        </div>
+      </div>`;
+  }).join('');
   let srcId=null;
-  document.querySelectorAll('.orden-card').forEach(card=>{
-    card.addEventListener('dragstart',()=>{srcId=card.dataset.id;setTimeout(()=>card.style.opacity='.4',0);});
+  list.querySelectorAll('.orden-card-grid').forEach(card=>{
+    card.addEventListener('dragstart',()=>{srcId=card.dataset.id;setTimeout(()=>card.style.opacity='.35',0);});
     card.addEventListener('dragend',()=>card.style.opacity='1');
     card.addEventListener('dragover',e=>{e.preventDefault();card.style.borderColor='var(--gold)';});
-    card.addEventListener('dragleave',()=>card.style.borderColor='var(--border)');
+    card.addEventListener('dragleave',()=>card.style.borderColor='transparent');
     card.addEventListener('drop',async e=>{
-      e.preventDefault();card.style.borderColor='var(--border)';
-      const list=rows.filter(m=>m.status==='aprobada').sort((a,b)=>(a.orden||0)-(b.orden||0));
-      const si=list.findIndex(m=>m.id===srcId);
-      const di=list.findIndex(m=>m.id===card.dataset.id);
-      if(si<0||di<0) return;
-      const [mv]=list.splice(si,1);list.splice(di,0,mv);
-      await Promise.all(list.map((m,i)=>sbU('models','id=eq.'+encodeURIComponent(m.id),{orden:i})));
-      renderAdmOrden();
+      e.preventDefault();card.style.borderColor='transparent';
+      const si=_admOrdenList.findIndex(m=>m.id===srcId);
+      const di=_admOrdenList.findIndex(m=>m.id===card.dataset.id);
+      if(si<0||di<0||si===di) return;
+      const [mv]=_admOrdenList.splice(si,1);_admOrdenList.splice(di,0,mv);
+      admPintarOrden(document.getElementById('orden-buscar')?.value||'');
+      await admGuardarOrden();
     });
   });
 }
+async function admMoverOrden(id,dir){
+  const i=_admOrdenList.findIndex(m=>m.id===id);
+  const j=i+dir;
+  if(i<0||j<0||j>=_admOrdenList.length) return;
+  [_admOrdenList[i],_admOrdenList[j]]=[_admOrdenList[j],_admOrdenList[i]];
+  admPintarOrden(document.getElementById('orden-buscar')?.value||'');
+  await admGuardarOrden();
+}
+async function admGuardarOrden(){
+  await Promise.all(_admOrdenList.map((m,i)=>sbU('models','id=eq.'+encodeURIComponent(m.id),{orden:i})));
+}
 async function admToggleStarOrden(id){
-  const rows=await sbQ('models','id=eq.'+encodeURIComponent(id));
-  const m=rows[0]; if(!m) return;
-  await sbU('models','id=eq.'+encodeURIComponent(id),{destacada:!m.destacada});
-  renderAdmOrden();
+  const m=_admOrdenList.find(x=>x.id===id);
+  if(!m) return;
+  m.destacada=!m.destacada;
+  await sbU('models','id=eq.'+encodeURIComponent(id),{destacada:m.destacada});
+  admPintarOrden(document.getElementById('orden-buscar')?.value||'');
 }
 
 /* ============ ADMIN — CAMPAÑAS ============ */
