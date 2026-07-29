@@ -453,7 +453,7 @@ async function sbI(t,row){
   }
 }
 async function sbU(t,f,body){try{const r=await fetch(`${SB}/rest/v1/${t}?${f}`,{method:'PATCH',headers:SH,body:JSON.stringify(body)});return r.ok;}catch(e){return false;}}
-async function sbD(t,f){try{const r=await fetch(`${SB}/rest/v1/${t}?${f}`,{method:'DELETE',headers:SH});return r.ok;}catch(e){return false;}}
+async function sbD(t,f){try{const r=await fetch(`${SB}/rest/v1/${t}?${f}`,{method:'DELETE',headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal'}});return r.ok;}catch(e){return false;}}
 
 function hash(s){let h=0;for(let i=0;i<s.length;i++)h=Math.imul(31,h)+s.charCodeAt(i)|0;return Math.abs(h).toString(16);}
 
@@ -1970,7 +1970,7 @@ async function admEliminar(id,nombre){
   await sbD('postulaciones','modelo_id=eq.'+encodeURIComponent(id));
   await sbD('cuentas_cobro','modelo_id=eq.'+encodeURIComponent(id));
   try{
-    const r=await fetch(`${SB}/rest/v1/models?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:SH});
+    const r=await fetch(`${SB}/rest/v1/models?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Prefer':'return=minimal'}});
     if(!r.ok){
       const detail=await r.text().catch(()=>'');
       alert('No se pudo eliminar la modelo.\n\n'+(detail||'Error desconocido de la base de datos.'));
