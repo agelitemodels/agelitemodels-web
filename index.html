@@ -1290,7 +1290,7 @@ async function loadApprovedModels(){
   const rows = await dbSelectAll();
   const models = rows.map(rowToModel).filter(m => m.status === 'aprobada');
   const featured = models.filter(m=>m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
-  const rest = models.filter(m=>!m.destacada).sort((a,b)=>(b.approvedAt||0)-(a.approvedAt||0));
+  const rest = models.filter(m=>!m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
   approvedModels = [...featured, ...rest];
   featuredModels = featured;
 }

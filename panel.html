@@ -979,7 +979,7 @@ function renderSidebar(){
     {id:'adm-fotos',icon:'📸',label:'Pedir Fotos'},
     {id:'adm-aprobadas',icon:'✅',label:'Aprobadas'},
     {id:'adm-rechazadas',icon:'✗',label:'Rechazadas'},
-    {id:'adm-orden',icon:'⬍',label:'Orden Portada'},
+    {id:'adm-orden',icon:'⬍',label:'Orden Catálogo'},
     {id:'adm-campanas',icon:'🎯',label:'Campañas'},
     {id:'adm-cuentas',icon:'🧾',label:'Cuentas de Cobro'},
   ];
@@ -1966,8 +1966,21 @@ async function admToggleStar(id){
   navTo(_tab);
 }
 async function admEliminar(id,nombre){
-  if(!confirm(`¿Eliminar a "${nombre}" permanentemente?`)) return;
-  try{await fetch(`${SB}/rest/v1/models?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:SH});}catch(e){}
+  if(!confirm(`¿Eliminar a "${nombre}" permanentemente?\n\nEsto también borrará sus postulaciones y cuentas de cobro asociadas. No se puede deshacer.`)) return;
+  await sbD('postulaciones','modelo_id=eq.'+encodeURIComponent(id));
+  await sbD('cuentas_cobro','modelo_id=eq.'+encodeURIComponent(id));
+  try{
+    const r=await fetch(`${SB}/rest/v1/models?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:SH});
+    if(!r.ok){
+      const detail=await r.text().catch(()=>'');
+      alert('No se pudo eliminar la modelo.\n\n'+(detail||'Error desconocido de la base de datos.'));
+      return;
+    }
+  }catch(e){
+    alert('Error de conexión al intentar eliminar.');
+    return;
+  }
+  document.getElementById('adm-edit-overlay')?.remove();
   navTo(_tab);
 }
 async function admPedirFotos(id){
@@ -2049,6 +2062,7 @@ function admVerModelo(id){
       </div>
 
       <button onclick="admGuardarModelo()" style="background:var(--gold);color:var(--bg);border:none;padding:.6rem 1.4rem;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);font-weight:700">Guardar Cambios</button>
+      <button onclick="admEliminar('${m.id}','${(m.nombre_artistico||'').replace(/'/g,"\\'")}')" style="background:none;border:1px solid var(--red);color:var(--red);padding:.6rem 1.2rem;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--ff);margin-left:.6rem">🗑 Eliminar Modelo</button>
       <span class="fstatus" id="em-status" style="display:inline-block;margin-left:.8rem"></span>
     </div>`;
   document.body.appendChild(overlay);
@@ -2133,19 +2147,20 @@ async function admGuardarModelo(){
   }
 }
 
-/* ============ ADMIN — ORDEN PORTADA ============ */
+/* ============ ADMIN — ORDEN DEL CATÁLOGO ============ */
 async function renderAdmOrden(){
   const el=document.getElementById('main-content');
   el.innerHTML=`<div class="loader-wrap"><div class="loader-spin"></div>Cargando...</div>`;
   const rows=await sbQ('models');
-  const featured=rows.filter(m=>m.status==='aprobada'&&m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
-  if(!featured.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden Portada</div><div class="empty" style="padding:4rem"><div class="empty-icon">⬍</div>No hay modelos destacadas. Márcalas con ★ en Aprobadas.</div>`;return;}
-  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden Portada</div><p style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">Arrastra para cambiar el orden en que aparecen en la portada.</p>
-    <div id="orden-list">${featured.map((m,i)=>`
+  const aprobadas=rows.filter(m=>m.status==='aprobada').sort((a,b)=>(a.orden||0)-(b.orden||0));
+  if(!aprobadas.length){el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden del Catálogo</div><div class="empty" style="padding:4rem"><div class="empty-icon">⬍</div>No hay modelos aprobadas todavía.</div>`;return;}
+  el.innerHTML=`<div style="margin-bottom:1rem;font-size:.9rem;font-weight:500">Orden del Catálogo (${aprobadas.length})</div><p style="font-size:.78rem;color:var(--gray);margin-bottom:1rem">Arrastra para cambiar el orden en que aparecen en el catálogo público y en "Talento Destacado". La estrella marca quién sale en el carrusel destacado de la portada.</p>
+    <div id="orden-list">${aprobadas.map((m,i)=>`
       <div class="panel orden-card" draggable="true" data-id="${m.id}" style="display:flex;align-items:center;gap:1rem;margin-bottom:.6rem;cursor:grab">
         <span style="color:var(--gray2)">⠿</span>
         <div class="model-foto">${m.fotos&&m.fotos[0]?`<img src="${m.fotos[0]}" style="object-position:center ${mFotoPos(m.fotos_pos,0)}%">`:''}</div>
         <div style="flex:1;font-weight:500">${m.nombre_artistico||''}</div>
+        <button onclick="event.stopPropagation();admToggleStarOrden('${m.id}')" style="background:none;border:1px solid ${m.destacada?'var(--gold)':'var(--border)'};color:${m.destacada?'var(--gold)':'var(--gray)'};padding:.4rem .7rem;font-size:.68rem;cursor:pointer;font-family:var(--ff)">${m.destacada?'★ Destacada':'☆ Destacar'}</button>
         <div style="font-size:1.6rem;color:var(--gray2);font-weight:700">${String(i+1).padStart(2,'0')}</div>
       </div>`).join('')}</div>`;
   let srcId=null;
@@ -2156,7 +2171,7 @@ async function renderAdmOrden(){
     card.addEventListener('dragleave',()=>card.style.borderColor='var(--border)');
     card.addEventListener('drop',async e=>{
       e.preventDefault();card.style.borderColor='var(--border)';
-      const list=rows.filter(m=>m.status==='aprobada'&&m.destacada).sort((a,b)=>(a.orden||0)-(b.orden||0));
+      const list=rows.filter(m=>m.status==='aprobada').sort((a,b)=>(a.orden||0)-(b.orden||0));
       const si=list.findIndex(m=>m.id===srcId);
       const di=list.findIndex(m=>m.id===card.dataset.id);
       if(si<0||di<0) return;
@@ -2165,6 +2180,12 @@ async function renderAdmOrden(){
       renderAdmOrden();
     });
   });
+}
+async function admToggleStarOrden(id){
+  const rows=await sbQ('models','id=eq.'+encodeURIComponent(id));
+  const m=rows[0]; if(!m) return;
+  await sbU('models','id=eq.'+encodeURIComponent(id),{destacada:!m.destacada});
+  renderAdmOrden();
 }
 
 /* ============ ADMIN — CAMPAÑAS ============ */
